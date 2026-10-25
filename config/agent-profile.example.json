@@ -1,0 +1,29 @@
+{
+  "schema": "agent-backend-profile/v1",
+  "providerID": "your-provider",
+  "modelID": "your-model",
+  "reasoningEffort": "high",
+  "baseURL": "https://api.example.invalid/v1",
+  "credentialSource": "native credential store or deployment environment; never commit credentials",
+  "goal": {
+    "id": "example-goal",
+    "revision": 1,
+    "objective": "Implement the approved requirement in the existing consumer and verify its behavior"
+  },
+  "recovery": {
+    "maxConsecutiveProviderFailures": 2,
+    "ownerStopPreserved": true,
+    "unknownOutcomeReplay": false
+  },
+  "sourceContext": {
+    "requiredBinding": [
+      "goalID",
+      "revision",
+      "path",
+      "sha256",
+      "range"
+    ],
+    "preserveNativeHistory": true,
+    "loadSkillsOnDemand": true
+  }
+}

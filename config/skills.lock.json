@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "skills": [
+    {
+      "name": "security-audit",
+      "repo": "cloudflare/security-audit-skill",
+      "commit": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "path": "skills/security-audit",
+      "url": "https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit"
+    },
+    {
+      "name": "workers-best-practices",
+      "repo": "cloudflare/skills",
+      "commit": "86505e44f87d801aa1864a3c4109e9a8ae5c409f",
+      "path": "skills/workers-best-practices",
+      "url": "https://github.com/cloudflare/skills/tree/86505e44f87d801aa1864a3c4109e9a8ae5c409f/skills/workers-best-practices"
+    },
+    {
+      "name": "differential-review",
+      "repo": "trailofbits/skills",
+      "commit": "196a9073ab10d35bacf111f945e02c00b2c6883a",
+      "path": "plugins/differential-review/skills/differential-review",
+      "url": "https://github.com/trailofbits/skills/tree/196a9073ab10d35bacf111f945e02c00b2c6883a/plugins/differential-review/skills/differential-review"
+    },
+    {
+      "name": "sharp-edges",
+      "repo": "trailofbits/skills",
+      "commit": "196a9073ab10d35bacf111f945e02c00b2c6883a",
+      "path": "plugins/sharp-edges/skills/sharp-edges",
+      "url": "https://github.com/trailofbits/skills/tree/196a9073ab10d35bacf111f945e02c00b2c6883a/plugins/sharp-edges/skills/sharp-edges"
+    },
+    {
+      "name": "doc-coauthoring",
+      "repo": "anthropics/skills",
+      "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "path": "skills/doc-coauthoring",
+      "url": "https://github.com/anthropics/skills/tree/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/doc-coauthoring"
+    },
+    {
+      "name": "playwright-cli",
+      "repo": "microsoft/playwright-cli",
+      "commit": "b1a5903c5b633b8c9f843ad7b629c2a78437040c",
+      "path": "skills/playwright-cli",
+      "url": "https://github.com/microsoft/playwright-cli/tree/b1a5903c5b633b8c9f843ad7b629c2a78437040c/skills/playwright-cli"
+    },
+    {
+      "name": "systematic-debugging",
+      "repo": "obra/superpowers",
+      "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "path": "skills/systematic-debugging",
+      "url": "https://github.com/obra/superpowers/tree/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/systematic-debugging"
+    },
+    {
+      "name": "verification-before-completion",
+      "repo": "obra/superpowers",
+      "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "path": "skills/verification-before-completion",
+      "url": "https://github.com/obra/superpowers/tree/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/verification-before-completion"
+    },
+    {
+      "name": "test-driven-development",
+      "repo": "obra/superpowers",
+      "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "path": "skills/test-driven-development",
+      "url": "https://github.com/obra/superpowers/tree/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/test-driven-development"
+    },
+    {
+      "name": "receiving-code-review",
+      "repo": "obra/superpowers",
+      "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "path": "skills/receiving-code-review",
+      "url": "https://github.com/obra/superpowers/tree/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/receiving-code-review"
+    }
+  ]
+}

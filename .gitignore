@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.private.*
+*.db
+*.sqlite*
+.runtime/
+.opencode-state/
+.dsh/
+coverage/
+*.log

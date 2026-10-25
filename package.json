@@ -1,0 +1,24 @@
+{
+  "name": "vantemio-agentic-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Provider-neutral agent backend policies, configuration templates and pinned skill integrations",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check:release": "node scripts/check-release.mjs"
+  },
+  "exports": {
+    "./continuation": "./src/continuation-policy.mjs",
+    "./recovery": "./src/backend-repair-policy.mjs",
+    "./budget": "./src/request-budget.mjs",
+    "./pacing": "./src/request-pacing.mjs",
+    "./enrollment": "./src/lazy-bound-hooks.mjs",
+    "./provider-failures": "./src/provider-failures.mjs",
+    "./guards": "./src/recovery-guards.mjs"
+  }
+}
