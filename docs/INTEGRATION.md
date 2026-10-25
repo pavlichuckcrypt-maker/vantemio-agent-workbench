@@ -29,3 +29,41 @@ Deployment-specific memory/graph/peer/transport adapters, credentials, native da
 ## Current task documents
 
 Call `readCurrentTaskDocuments(authoritativeWorkspaceRoot)` during each normal system transform, after resolving the current actor/Goal binding. Required files are `TECHNICAL_TASK.md` and `REQUIREMENTS.md`; missing or unreadable files reject rather than silently reusing stale text. The helper does not select a workspace, authorize access or create a file. Preserve task/source history separately. This is a document freshness fix, not a guarantee that the model follows the document.
+
+## Bound system transform
+
+Import `createTaskContextTransform` from `vantemio-agentic-backend/task-context` after installing this repository as a local package (`npm install /absolute/path/to/checkout` in your integration project). No registry package is published.
+
+```js
+import {createTaskContextTransform} from 'vantemio-agentic-backend/task-context';
+
+export function taskHooks(nativeTasks) {
+  return {
+    'experimental.chat.system.transform': createTaskContextTransform({
+      maxContextBytes: 262144,
+      resolveTask: async ({sessionID}) => nativeTasks.current(sessionID),
+    }),
+  };
+}
+```
+
+`nativeTasks.current` is **your authoritative host integration**, not an API provided by this kit. It must resolve only enrolled sessions and return:
+
+```js
+{
+  binding: {
+    actorID: 'actor-a', sessionID: 'session-a', goalID: 'goal-a',
+    revision: 1, inputID: 'original-current-input'
+  },
+  workspaceRoot: '/absolute/owned/task/workspace',
+  fullGoal: 'The complete current approved Goal, without summarizing it away',
+  projectContext: 'Relevant verified architecture, prototype and Source/result references',
+  ownerStop: false
+}
+```
+
+On Windows use an absolute native path. The host owns enrollment, filesystem authorization and the current full Goal; never accept a workspace supplied by model text, external content or an unverified peer. The revision must change when the bound task changes. The resolver runs before and after asynchronous document reads; changes to any binding field, root, Goal or project context reject before output mutation. Owner Stop must be an explicit boolean. A missing `sessionID` rejects instead of guessing an actor. Do not attach to unbound small-model or compaction calls. `maxContextBytes` must be an integer from 1 through 1048576; it bounds only this added UTF-8 block, **not total input tokens**. Overflow rejects, never silently truncates the Goal.
+
+For OpenCode, return these hooks from your existing local plugin factory. The upstream [plugin guide](https://opencode.ai/docs/plugins/) describes loading local plugins; the [hook type](https://github.com/anomalyco/opencode/blob/dev/packages/plugin/src/index.ts) exposes an optional session ID and a mutable `system: string[]`. This adapter requires the session ID. Qualify your installed version and native task resolver before enabling it. This kit does not install, restart or reconfigure an existing application.
+
+The hook appends one deterministic JSON context entry to the existing system array. It does not change native messages, tool results, model parameters, TODO or Goal storage. Per-request IDs are checked but omitted from the added text so an unchanged context stays byte-stable. This aids prefix reuse but proves no cache hit. Call once per freshly assembled model request. A host must propagate rejection and re-resolve the task rather than dispatching with a previous context or blindly retrying. Recheck Stop/admission at the actual network boundary as well: the hook does not hold a lifecycle lock. Document writes must use the host's existing revision/snapshot discipline; this is not a filesystem transaction or an atomic multi-document publisher. Source retention and model-specific history compaction remain separate host adapters.

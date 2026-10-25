@@ -20,3 +20,7 @@ Run `npm test` and `npm run check:release`. Public adaptations remove machine de
 ## Model quality
 
 A requested/reported model name and reasoning setting do not attest the underlying model behind a proxy. Judge quality by correct implemented changes, independent tests, adherence to scope and actual consumer behavior. Private reasoning transcripts, internal paths, chat history and model credentials are not published here.
+
+## 0.2.0 task hook
+
+Fourteen new offline regression cases exercise a model-step/tool-step/model-step caller, changed files without recreating the hook, stable unchanged prefix, all five binding fields changing during a read, root/Goal/project-context changes, Stop at both boundaries, missing/oversized documents, invalid sessions and concurrent actor isolation. The caller is an isolated integration fixture; it does not claim a paid provider run or installation of the new hook in live chats. The earlier native deployment evidence belongs to the deployed document reader, not this newly exported wrapper.

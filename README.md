@@ -32,12 +32,16 @@ Import the modules from `src/`, or install this repository as a local package. C
 
 | Path | Purpose |
 |---|---|
-| `src/` | Eight reusable policy modules extracted/adapted from deployed code |
+| `src/` | Nine reusable policy/integration modules extracted/adapted from deployed code |
 | `config/` | Credential-free request/profile examples and exact upstream skill pins |
 | `test/` | Offline isolated regression tests |
 | `docs/INTEGRATION.md` | Runtime contracts and what remains deployment-specific |
 | `docs/VALIDATION.md` | Verification scope and limitations |
 | `THIRD_PARTY.md` | Upstream links and redistribution boundaries |
+
+## Task context hook
+
+`createTaskContextTransform` from `vantemio-agentic-backend/task-context` connects the required-document reader to the host system-transform hook. Each call resolves the current task, reads its documents and rechecks actor/session/Goal/revision/input before appending the full Goal and project context. It preserves existing system entries and rejects Stop, changed bindings, missing documents or oversized context. See the runnable local adapter recipe in [INTEGRATION.md](docs/INTEGRATION.md#bound-system-transform). No provider request is dispatched by this hook.
 
 ## Skills
 
