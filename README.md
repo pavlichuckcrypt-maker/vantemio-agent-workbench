@@ -32,7 +32,7 @@ Import the modules from `src/`, or install this repository as a local package. C
 
 | Path | Purpose |
 |---|---|
-| `src/` | Seven reusable policy modules extracted/adapted from deployed code |
+| `src/` | Eight reusable policy modules extracted/adapted from deployed code |
 | `config/` | Credential-free request/profile examples and exact upstream skill pins |
 | `test/` | Offline isolated regression tests |
 | `docs/INTEGRATION.md` | Runtime contracts and what remains deployment-specific |

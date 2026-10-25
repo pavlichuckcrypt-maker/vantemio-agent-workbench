@@ -25,3 +25,7 @@ The budget validator enforces configured bounds; it is not a tokenizer or proof 
 Install skills from the lock file using the host's supported installer. Only pins/links are redistributed. The Cloudflare validator uses POSIX file protections; its Windows CLI failed compatibility checks and must not be weakened. Run its unchanged validator on an appropriate POSIX host. Playwright uses an isolated named browser session; do not attach to other users' browser state or close all sessions. Its file URL restrictions stay in force.
 
 Deployment-specific memory/graph/peer/transport adapters, credentials, native databases, raw requests, runtime ledgers, scheduled tasks and product code are intentionally excluded. Reproduce their contracts in an owned environment before public release. This reference kit is not a security certification.
+
+## Current task documents
+
+Call `readCurrentTaskDocuments(authoritativeWorkspaceRoot)` during each normal system transform, after resolving the current actor/Goal binding. Required files are `TECHNICAL_TASK.md` and `REQUIREMENTS.md`; missing or unreadable files reject rather than silently reusing stale text. The helper does not select a workspace, authorize access or create a file. Preserve task/source history separately. This is a document freshness fix, not a guarantee that the model follows the document.

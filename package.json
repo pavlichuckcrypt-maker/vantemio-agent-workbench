@@ -1,6 +1,6 @@
 {
   "name": "vantemio-agentic-backend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Provider-neutral agent backend policies, configuration templates and pinned skill integrations",
@@ -19,6 +19,7 @@
     "./pacing": "./src/request-pacing.mjs",
     "./enrollment": "./src/lazy-bound-hooks.mjs",
     "./provider-failures": "./src/provider-failures.mjs",
-    "./guards": "./src/recovery-guards.mjs"
+    "./guards": "./src/recovery-guards.mjs",
+    "./task-documents": "./src/current-task-documents.mjs"
   }
 }
