@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2 — 2026-10-26
+
+Classify the exact native unique-match edit rejection as a known failure before file mutation. Preserve original error/call/input/time, reject replaceAll, partial-output and unrelated mutation errors, and retain host identity/Stop/UNKNOWN/no-replay guards. Add public regressions, an installed-package ambiguous-edit consumer, and updated RU/EN integration contracts.
+
 ## 0.5.1 — 2026-10-26
 
 Classify the exact terminal native edit rejection for identical old/new strings as a known failure before execution. Preserve the original error and input/call/time hashes; keep arbitrary mutation failures, running tools and UNKNOWN outcomes blocked. Add19 public regressions and an offline installed-package consumer. Native host acceptance resumed the same stopped task without replaying its rejected edit.

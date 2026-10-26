@@ -58,7 +58,7 @@ See [the host contract and recipe](docs/REQUEST_ADAPTER.md) or [русское �
 
 ## Known native failures before execution
 
-`./native-tool-outcome` identifies one exact terminal native edit validation rejection: identical old/new strings. It preserves the failed result and binds its original call/input/error/time. The host may use that proof in its existing admission/recovery decision, while retaining all other lifecycle guards. See [the host contract](docs/NATIVE_TOOL_OUTCOMES.md) and [русское руководство](docs/NATIVE_TOOL_OUTCOMES.ru.md). It does not replay a tool or treat failures as successful changes.
+`./native-tool-outcome` identifies exact terminal native edit validation rejections: identical old/new strings or an ambiguous unique-match replacement before file mutation. It preserves the failed result and binds its original call/input/error/time. The host may use that proof in its existing admission/recovery decision, while retaining all other lifecycle guards. See [the host contract](docs/NATIVE_TOOL_OUTCOMES.md) and [русское руководство](docs/NATIVE_TOOL_OUTCOMES.ru.md). It does not replay a tool or treat failures as successful changes.
 
 ## Skills
 
