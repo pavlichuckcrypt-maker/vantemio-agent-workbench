@@ -31,6 +31,7 @@ import {normalizeProviderUsage,aggregateProviderUsage} from 'vantemio-agentic-ba
 import {prefixCommandOnce} from 'vantemio-agentic-backend/command-prefix';
 import {observeUsageStream} from 'vantemio-agentic-backend/usage-stream';
 import {qualifySourceView,qualifySourceViewFile} from 'vantemio-agentic-backend/source-view';
+import {knownNativeNoEffectFailure} from 'vantemio-agentic-backend/native-tool-outcome';
 
 const workspaceRoot=path.join(process.cwd(),'task');
 await mkdir(workspaceRoot);
@@ -88,7 +89,14 @@ const wire='data: '+JSON.stringify({id:'stream-a',choices:[{finish_reason:'stop'
 const observed=[];const response=observeUsageStream(new Response(wire,{headers:{'content-type':'text/event-stream'}}),{onUsage:(row,completed)=>observed.push({row,completed})});
 assert.equal(await response.text(),wire);assert.equal(observed.at(-1).completed,true);
 assert.equal(observed.at(-1).row.usage.prompt_tokens,1000);
-console.log(JSON.stringify({installedExports:true,taskRefresh:true,sourceReuse:true,requestAdapter:true,usageUnknownPreserved:true,sourceView:true,streamObserver:true,prefixOnce:true,providerRequests:0}));
+const rejectedPart={type:'tool',tool:'edit',callID:'call_installed_noop',state:{status:'error',
+  error:'No changes to apply: oldString and newString are identical.',
+  input:{filePath:path.join(workspaceRoot,'module.mjs'),oldString:'same',newString:'same'},time:{start:1,end:2}}};
+const nativeFailure=knownNativeNoEffectFailure(rejectedPart);
+assert.equal(nativeFailure.status,'known_failed_before_execution');assert.equal(nativeFailure.operationDispatched,false);
+assert.equal(rejectedPart.state.status,'error');
+assert.equal(knownNativeNoEffectFailure({...rejectedPart,state:{...rejectedPart.state,status:'running'}}),null);
+console.log(JSON.stringify({installedExports:true,taskRefresh:true,sourceReuse:true,requestAdapter:true,usageUnknownPreserved:true,sourceView:true,streamObserver:true,prefixOnce:true,knownNativeNoEffect:true,providerRequests:0}));
 `);
   const result = run([path.join(consumer,'verify.mjs')],consumer);
   console.log(result.trim());

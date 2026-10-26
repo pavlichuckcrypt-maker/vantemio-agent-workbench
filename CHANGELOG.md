@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1 — 2026-10-26
+
+Classify the exact terminal native edit rejection for identical old/new strings as a known failure before execution. Preserve the original error and input/call/time hashes; keep arbitrary mutation failures, running tools and UNKNOWN outcomes blocked. Add19 public regressions and an offline installed-package consumer. Native host acceptance resumed the same stopped task without replaying its rejected edit.
+
 ## 0.5.0 — 2026-10-26
 
 Preserve already complete native trusted context without inserting a duplicate task block. Add explicit host-estimate admission while keeping unknown hard token bounds labelled unknown; strict upper bounds remain the default. Add one-pass Chat/Responses SSE usage observation, exact owned command-prefix normalization, and qualified local Source aliases for read retention. Protect original provider bytes, terminal failures, task/host bindings and physical path containment. Expand the suite to 115 cases and the offline installed-package consumer. Native enrollment, durable ledgers, permissions and Source authority remain host responsibilities; no cache percentage or uninterrupted provider service is promised.

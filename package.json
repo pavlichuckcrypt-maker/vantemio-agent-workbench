@@ -1,6 +1,6 @@
 {
   "name": "vantemio-agentic-backend",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "type": "module",
   "description": "Provider-neutral agent backend policies, configuration templates and pinned skill integrations",
@@ -28,7 +28,8 @@
     "./request-adapter": "./src/agent-request-adapter.mjs",
     "./command-prefix": "./src/command-prefix.mjs",
     "./usage-stream": "./src/usage-stream.mjs",
-    "./source-view": "./src/source-view.mjs"
+    "./source-view": "./src/source-view.mjs",
+    "./native-tool-outcome": "./src/native-tool-outcome.mjs"
   },
   "files": [
     "src",

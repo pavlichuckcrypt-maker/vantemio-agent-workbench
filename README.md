@@ -56,6 +56,10 @@ See [the host contract and recipe](docs/REQUEST_ADAPTER.md) or [русское �
 
 `./usage-stream` observes Chat/Responses SSE while preserving the consumed provider bytes. `./command-prefix` removes repeated exact leading host prefixes. `./source-view` verifies an explicitly enrolled local alias for read retention without granting Source ownership; see [Source views](docs/SOURCE_VIEWS.md). Native serializers can preserve an already complete trusted context, and an explicit host-estimate mode keeps an unknown hard token bound labelled unknown. These remain host integration contracts, not automatic cache-hit guarantees.
 
+## Known native failures before execution
+
+`./native-tool-outcome` identifies one exact terminal native edit validation rejection: identical old/new strings. It preserves the failed result and binds its original call/input/error/time. The host may use that proof in its existing admission/recovery decision, while retaining all other lifecycle guards. See [the host contract](docs/NATIVE_TOOL_OUTCOMES.md) and [русское руководство](docs/NATIVE_TOOL_OUTCOMES.ru.md). It does not replay a tool or treat failures as successful changes.
+
 ## Skills
 
 `config/skills.lock.json` pins Cloudflare Security Audit/Workers Best Practices, Trail of Bits Differential Review/Sharp Edges, Anthropic Doc Coauthoring, Microsoft Playwright CLI, and four Superpowers engineering skills. Use the official installer for your agent, with the exact commit/path from the lock file. These are instruction packages, not correctness guarantees. Do not inject all their text into every request.
