@@ -1,4 +1,4 @@
-import {mkdtemp,mkdir,writeFile,rm} from 'node:fs/promises';
+import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import path from 'node:path';
 import os from 'node:os';
@@ -26,6 +26,8 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {createTaskContextTransform} from 'vantemio-agentic-backend/task-context';
 import {captureSourceReadEvidence,restoreCurrentEvidence} from 'vantemio-agentic-backend/evidence-context';
+import {createAgentRequestAdapter} from 'vantemio-agentic-backend/request-adapter';
+import {normalizeProviderUsage,aggregateProviderUsage} from 'vantemio-agentic-backend/usage';
 
 const workspaceRoot=path.join(process.cwd(),'task');
 await mkdir(workspaceRoot);
@@ -33,7 +35,7 @@ await writeFile(path.join(workspaceRoot,'TECHNICAL_TASK.md'),'Implement the curr
 await writeFile(path.join(workspaceRoot,'REQUIREMENTS.md'),'Preserve original call identity');
 await writeFile(path.join(workspaceRoot,'module.mjs'),'export const answer = 42;\\n');
 const task={binding:{actorID:'actor-a',sessionID:'session-a',goalID:'goal-a',revision:1,inputID:'input-a'},
-  workspaceRoot,fullGoal:'The full approved development Goal',projectContext:'Approved architecture and prototype',ownerStop:false};
+  workspaceRoot,fullGoal:'The full approved development Goal',projectContext:'Approved architecture and prototype',ownerStop:false,providerID:'provider-a',modelID:'model-a',busy:false,pendingPermission:false,liveTools:false,unknownTools:false,unknownAdmissions:false};
 const transform=createTaskContextTransform({resolveTask:async()=>task,maxContextBytes:262144});
 const first={system:['Native instructions']};
 await transform({sessionID:'session-a'},first);
@@ -56,7 +58,21 @@ assert.equal(JSON.parse(next.system[1]).fullGoal,task.fullGoal);
 assert.equal(projected.messages[1].content,bytes.toString('utf8'));
 assert.equal(projected.decisions[0].status,'current');
 assert.equal(messages[1].content,'Original read reference');
-console.log(JSON.stringify({installedExports:true,taskRefresh:true,sourceReuse:true,providerRequests:0}));
+const policy=${await readFile(path.join(root,'config/request-policy.example.json'),'utf8')};
+const adapter=createAgentRequestAdapter({policy,resolveTask:async()=>task,
+  resolveEvidence:async()=>({records:[record],originalResults:[original],currentSources:[{binding:task.binding,path:'module.mjs',sha256:createHash('sha256').update(bytes).digest('hex'),proofID:'current-version-a'}]}),
+  measureInput:async({serializedBody})=>({inputTokenUpperBound:Buffer.byteLength(serializedBody,'utf8'),method:'isolated text fixture byte upper bound'}),
+  assertSnapshotCurrent:async()=>{assert.equal(task.ownerStop,false)}});
+const prepared=await adapter.prepare({sessionID:'session-a',requestID:'installed-request-a',payload:{model:'model-a',max_tokens:1024,
+  messages:[{role:'user',content:'Continue the approved implementation'},...messages]}});
+await adapter.beforeDispatch(prepared);
+assert.equal(JSON.parse(prepared.serializedBody).messages.at(-1).content,bytes.toString('utf8'));
+const result=adapter.observe(prepared,{binding:prepared.binding,receiptID:'usage-a',observedAt:1,stage:'final',
+  usage:{prompt_tokens:1000,prompt_tokens_details:{cached_tokens:800},completion_tokens:20}});
+assert.equal(result.observation.metrics.uncachedInputTokens,200);
+assert.equal(aggregateProviderUsage([result.observation,result.observation]).finalRequests,1);
+assert.equal(normalizeProviderUsage({format:'chat-completions',binding:prepared.binding,receiptID:'usage-b',observedAt:1,stage:'final',usage:{prompt_tokens:1000}}).metrics.cachedInputTokens,null);
+console.log(JSON.stringify({installedExports:true,taskRefresh:true,sourceReuse:true,requestAdapter:true,usageUnknownPreserved:true,providerRequests:0}));
 `);
   const result = run([path.join(consumer,'verify.mjs')],consumer);
   console.log(result.trim());

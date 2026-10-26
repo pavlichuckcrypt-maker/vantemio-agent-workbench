@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 — 2026-10-26
+
+Add a common prepare/dispatch-boundary/observe adapter, qualified serializer extension points and explicit original provider usage normalization. Preserve native model/output parameters and reasoning/tool identities; reject changed task/Source/documents, lifecycle uncertainty and mismatched original outcomes. Cache UNKNOWN and final-snapshot coverage stay explicit; historical cache never grants automatic input credit. Harden provider failure accounting by native session. **Migration:** `providerFailureState` now requires `sessionID` alongside provider/model. Installed-package consumer and four usage protocols are covered; live chat settings are unchanged by this release.
+
 ## 0.3.1 — 2026-10-26
 
 Recognize the exact native `UnknownError` / `The operation timed out.` provider deadline in the existing bounded transient recovery policy. Bare tool timeouts, owner aborts, quota/key/model failures and unsettled tools remain excluded. Regression verifies exact error classification; native acceptance included a new successful assistant/read and subsequent ordinary step after safe shared backend loading, without replaying tools or changing the Goal/model.

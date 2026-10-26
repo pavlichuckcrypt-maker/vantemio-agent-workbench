@@ -1,10 +1,10 @@
 # Vantemio Agentic Backend
 
-Provider-neutral **backend policy kit and configuration reference** for autonomous coding agents. [Русский](docs/README.ru.md).
+Provider-neutral **backend policy kit and host integration adapters** for autonomous coding agents. [Русский](docs/README.ru.md).
 
 This repository shares the reusable parts of our development backend: bounded continuation, original-outcome accounting, provider failure guards, lazy plugin enrollment, request pacing, fresh/cache budget validation, and a pinned catalog of ten upstream engineering/audit skills.
 
-**Scope:** this is not a complete hosted agent, a drop-in OpenCode server, or the private Studio production system. Transport, native authentication, durable storage, context projection, model-specific serialization, peer identity and real execution adapters must be supplied by the integrator. The policy library does not grant write authority or independently dispatch model requests. Do not deploy it as a replacement backend without testing those integrations.
+**Scope:** this is not a complete hosted agent, a drop-in OpenCode server, or the private Studio production system. The kit includes common task/context preparation, selected tool-result projection and usage accounting. Native authentication, enrollment, durable admission/storage, transport, peer identity and qualified provider-specific serializers still belong to the host. The policy library does not grant write authority or independently dispatch model requests. Do not deploy it as a replacement backend without testing those integrations.
 
 ## Quick start
 
@@ -47,6 +47,12 @@ Import the modules from `src/`, or install this repository as a local package. C
 ## Source and result continuity
 
 The `./evidence-context` export restores selected necessary Source/test output to the **same original tool message** after a host compactor replaces it with a reference. It checks original call arguments and receipt/content digests, task binding and current Source proofs. Changed Source or unresolved outcomes remain historical; nothing is rerun or promoted into system instructions. This adapter supports text tool results in the Chat Completions message shape, not every provider protocol. See [the integration contract](docs/INTEGRATION.md#source-and-result-continuity).
+
+## Common request adapter
+
+`./request-adapter` composes task freshness, Source/result continuity, full-body token/byte checks, lifecycle guards and original usage accounting. Integrate its `prepare`, `beforeDispatch` and `observe` methods once in the existing host request path. It creates no controller, model server or retry loop. The default serializer supports Chat Completions/DeepSeek chat; Responses and native Anthropic require an explicitly qualified host serializer, preserving native reasoning/tool blocks and generation settings.
+
+See [the host contract and recipe](docs/REQUEST_ADAPTER.md) or [русское руководство](docs/REQUEST_ADAPTER.ru.md). `./usage` normalizes four explicit usage shapes and reports cache coverage without inventing missing counters or guaranteed percentages.
 
 ## Skills
 

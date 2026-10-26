@@ -8,7 +8,7 @@ Use native session IDs, original input/outcome IDs, full Goals, revisions and mo
 
 `continuation-policy.decide` is a decision primitive, not a complete retry engine. Its caller must enforce a durable intent-before-send ledger, preserve UNKNOWN admissions, verify same actor/Goal/input and never replay tools. `recovery-guards` classifies selected transient stream failures; classification alone never authorizes a request. Maximum two consecutive recovery attempts is the reference configuration; real successes reset accounting, not HTTP200 or model catalogs. Do not generalize arbitrary400 errors to retryable failures. Existing deployment's separate empty400 policy and native transport are not distributed here.
 
-`providerFailureState` requires explicit providerID/modelID. The public version removes private provider bindings. `backend-repair-policy` accounts for changed candidates and requires reconciliation of original UNKNOWN results. Public hardening rejects a changed Source hash when resolving an existing operation.
+`providerFailureState` requires explicit providerID/modelID/sessionID. As of 0.4.0, callers must pass sessionID; successes from another session cannot reset accounting, and a mismatched failure or invalid counter rejects. The public version removes private provider bindings. `backend-repair-policy` accounts for changed candidates and requires reconciliation of original UNKNOWN results. Public hardening rejects a changed Source hash when resolving an existing operation.
 
 ## Context and cache
 
@@ -105,3 +105,7 @@ export async function assembleMessages(host, sessionID, nativeMessages) {
 `decisions` are `current` with the original receipt/input and current proof IDs, or `historical_only` with a reason. Historical output must not be labelled as current Source/test evidence. This does not prohibit the model from reading necessary changed Source through the normal tools. Do not turn a stale-evidence decision into a retry of the original write/test/API call. Original `UNKNOWN`/live/error outcomes are retained as historical and remain subject to the host's existing unresolved-outcome guards. A context projection cannot release claims or authorize continuation.
 
 `maxEvidenceBytes` is an integer from 1 through 1048576. It bounds the sum of unique restored UTF-8 contents only, not the complete prompt or tokenizer estimate. Exceeding it rejects before output is changed; a host must select the necessary range/results explicitly, never pad for cache or silently truncate Source.
+
+## Common host request path
+
+The composed `./request-adapter` API and exact usage shapes are documented in [REQUEST_ADAPTER.md](REQUEST_ADAPTER.md) and [REQUEST_ADAPTER.ru.md](REQUEST_ADAPTER.ru.md). This adds one reusable host request boundary; it does not replace existing admission, authentication, native tools or production authority. The standalone policies above remain usable independently.

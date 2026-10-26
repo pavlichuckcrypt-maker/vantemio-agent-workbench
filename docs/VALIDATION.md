@@ -34,3 +34,13 @@ Twenty-one additional cases cover exact Source-range reuse through an offline mo
 ## 0.3.1 native deadline recovery
 
 The exact typed native deadline previously fell through the transient classifier. The repaired native callback passed isolated deadline/abort/quota checks and admitted only one continuation for the same failed original. After guarded loading at proven idle/unsent boundaries, the affected worker completed a new Source read and a following ordinary step under the same Goal/model. Dispatched model requests and tools were preserved. This qualifies the exact deadline case, not arbitrary timeout strings or permanent provider availability.
+
+## 0.4.0 common host adapter and usage
+
+The installed-package consumer now imports the composed request adapter and usage exports. It prepares a complete task, retains an original read, checks the dispatch boundary, consumes a provider-format usage fixture and preserves missing cache metadata. No provider requests are made by this installation test.
+
+Regression coverage includes all six lifecycle flags (including UNKNOWN model admissions and distinguishing a SAME owned unsent request from another live model), asynchronous task/Source/document changes, post-pacing tokenizer changes, exact body/outcome binding, generation-setting preservation, required full context, qualified native serializer extension points, cache-admission receipts, all four usage shapes, cold/write/unknown/invalid counters, final snapshot deduplication and session-bound failure accounting. The full public suite has 96 cases.
+
+A separate read-only diagnostic checked 40 original natural provider usage records against the new counter normalizer: 30 reported cache counters and 10 missing-cache records matched the existing observer. No paid probes or chat settings changes were performed. This qualifies counter semantics only: diagnostic Goal/input bindings were explicitly synthetic, and no claim of full native admission/Goal attestation is made from that sample.
+
+The new composed adapter is verified through ordinary installed-package model/tool callers with fixture model outcomes, not a new live installation in all six chats. Existing live native document/recovery evidence above remains separate. Native transport, durable ledger fencing, final Source authority, credential access and any custom serializer must be qualified by the integrator; neither offline CI nor this package certifies a complete hosted agent or uninterrupted external services.
