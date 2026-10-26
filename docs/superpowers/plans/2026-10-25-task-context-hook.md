@@ -30,7 +30,9 @@
 
 **Interfaces:** createTaskContextTransform({resolveTask, maxContextBytes}) returns async (input, output) => void; resolveTask(input) supplies binding, workspaceRoot, fullGoal, projectContext and ownerStop.
 
-- [ ] Add failing regression tests for each Review Focus condition and for a next model request after a normal tool writes an updated required document.
-- [ ] Implement per-call reads and two binding snapshots; append one deterministic context entry only after validation.
-- [ ] Run relevant regressions and the complete public suite; document exact integration support and limitations in RU/EN.
-- [ ] Verify the same portable package on Windows, review the publication diff, run release scan and publish a verified update with GitHub CI readback.
+- [x] Add failing regression tests for each Review Focus condition and for a next model request after a normal tool writes an updated required document.
+- [x] Implement per-call reads and two binding snapshots; append one deterministic context entry only after validation.
+- [x] Run relevant regressions and the complete public suite; document exact integration support and limitations in RU/EN.
+- [x] Verify the same portable package on Windows, review the publication diff, run release scan and publish a verified update with GitHub CI readback.
+
+Published as commit 422323d10df30c666088bcf82ca6634a6a14a699; Mac/Windows 35 tests and GitHub CI run 40246529570 passed. The new wrapper was not installed in live chats.

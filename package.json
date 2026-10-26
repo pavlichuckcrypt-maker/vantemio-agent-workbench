@@ -1,6 +1,6 @@
 {
   "name": "vantemio-agentic-backend",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "Provider-neutral agent backend policies, configuration templates and pinned skill integrations",
@@ -10,7 +10,8 @@
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check:release": "node scripts/check-release.mjs"
+    "check:release": "node scripts/check-release.mjs",
+    "smoke:install": "node scripts/smoke-install.mjs"
   },
   "exports": {
     "./continuation": "./src/continuation-policy.mjs",
@@ -21,6 +22,16 @@
     "./provider-failures": "./src/provider-failures.mjs",
     "./guards": "./src/recovery-guards.mjs",
     "./task-documents": "./src/current-task-documents.mjs",
-    "./task-context": "./src/task-context-hook.mjs"
-  }
+    "./task-context": "./src/task-context-hook.mjs",
+    "./evidence-context": "./src/evidence-context.mjs"
+  },
+  "files": [
+    "src",
+    "config",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY.md",
+    "CHANGELOG.md"
+  ]
 }

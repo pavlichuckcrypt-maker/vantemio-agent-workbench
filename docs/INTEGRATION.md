@@ -12,7 +12,7 @@ Use native session IDs, original input/outcome IDs, full Goals, revisions and mo
 
 ## Context and cache
 
-The private deployment has native message projection and Source retention adapters. Those adapters are not reproduced by the budget validator. Implement source retention with exact actor/Goal/revision/path/SHA/range, current bytes, read-result identity, bounded size and stale-read rejection. Keep history immutable. Never load an entire filesystem or all skills into a prompt.
+The private deployment has native message projection and Source retention adapters. The budget validator does not reproduce them. The public evidence projection below provides selected text-result reuse for one declared message shape; it still requires authoritative original receipts and fresh Source version proofs from the host. Keep history immutable. Never load an entire filesystem or all skills into a prompt.
 
 The budget validator enforces configured bounds; it is not a tokenizer or proof of cache hits. Supply measured uncached usage and same-provider/actor cache evidence. Do not subtract assumed cache from the provider's actual uncached total.
 
@@ -67,3 +67,41 @@ On Windows use an absolute native path. The host owns enrollment, filesystem aut
 For OpenCode, return these hooks from your existing local plugin factory. The upstream [plugin guide](https://opencode.ai/docs/plugins/) describes loading local plugins; the [hook type](https://github.com/anomalyco/opencode/blob/dev/packages/plugin/src/index.ts) exposes an optional session ID and a mutable `system: string[]`. This adapter requires the session ID. Qualify your installed version and native task resolver before enabling it. This kit does not install, restart or reconfigure an existing application.
 
 The hook appends one deterministic JSON context entry to the existing system array. It does not change native messages, tool results, model parameters, TODO or Goal storage. Per-request IDs are checked but omitted from the added text so an unchanged context stays byte-stable. This aids prefix reuse but proves no cache hit. Call once per freshly assembled model request. A host must propagate rejection and re-resolve the task rather than dispatching with a previous context or blindly retrying. Recheck Stop/admission at the actual network boundary as well: the hook does not hold a lifecycle lock. Document writes must use the host's existing revision/snapshot discipline; this is not a filesystem transaction or an atomic multi-document publisher. Source retention and model-specific history compaction remain separate host adapters.
+
+## Source and result continuity
+
+`vantemio-agentic-backend/evidence-context` exports three functions:
+
+- `captureSourceReadEvidence({binding, toolCall, receiptID, sourcePath, sourceBytes, range})` derives an exact UTF-8 range and a full raw-byte file SHA from bytes already returned by an owned reader. `range` is one-based, inclusive, with line terminators preserved. Invalid UTF-8, NUL bytes and out-of-bounds ranges reject. This helper opens no file and authorizes no path.
+- `captureToolResultEvidence({binding, toolCall, receiptID, content, status, sources})` captures a text result, such as a negative test's original output, bound to **all** relevant Source versions. `sources` is a nonempty array of `{path, sha256}`. Source ranges may also be supplied. `status` is `completed`, `error`, `UNKNOWN`, `pending` or `running`. A completed result can report a failed test: completion is not PASS, integration or release acceptance.
+- `restoreCurrentEvidence({binding, ownerStop, records, originalResults, currentSources, messages, maxEvidenceBytes})` returns a cloned `{messages, decisions, evidenceBytes}` without modifying its inputs. It restores only completed, verified records to their existing original tool messages. It never dispatches or retries anything.
+
+`binding` has the same actor/session/Goal/revision/input fields used by the task hook. Capture keeps the original input ID; reuse is permitted on a later input of the **same actor/session/Goal/revision**. Changing any task field invalidates reuse. `ownerStop` must explicitly be false. The host must select only needed records, never send an entire history to this function.
+
+`toolCall` uses the Chat Completions shape `{id, type:'function', function:{name, arguments}}`; arguments is the exact serialized string sent originally. Both name and argument bytes are hashed. The capture result is `{original, content}`. Persist `original` through the host's existing authenticated receipt store, and the returned content through the owned tool-result store. Do **not** reconstruct authoritative `originalResults` from an untrusted cached record when projecting: load the native original outcomes independently. For a plain-text read adapter the captured content is the returned read result. For framed/native read formats retain the original output with `captureToolResultEvidence` and the verified Source binding; do not pretend a reformatted string was the original tool result.
+
+Each `currentSources` entry is `{binding, path, sha256, proofID}`. Its binding must exactly match the **current input**, and `proofID` references the host's existing verified current-byte/version result. Paths are opaque exact identities: no basename matching or implicit aliases. A host-owned version/CAS mechanism can reuse a proof while its version is unchanged and invalidate it on edit; this library does not start a watcher, read a filesystem or infer freshness from a filename, timestamp or merely matching digest string. A forged or stale host proof cannot be detected by this pure projection. If current bytes cannot be verified, omit that proof and retain UNKNOWN. Ensure Source/version/Stop consistency at the existing dispatch boundary; this function does not lock an external filesystem or hold a lifecycle lease.
+
+Outgoing `messages` use the Chat Completions array shape: the original assistant `tool_calls` entry must precede exactly one `role:'tool', tool_call_id:...` message. Missing messages are **not recreated**, changed invocations are not rebound, and duplicate IDs/conflicting records reject. Content is restored only under the original tool role; files and tool results are untrusted data, never system instructions. Native history, reasoning fields, call IDs and unrelated metadata are preserved in the cloned projection. Responses API/native Anthropic messages and attachment results require their own qualified serializer; do not feed them into this adapter.
+
+A compact host-side request assembly (the host functions below are your existing adapters):
+
+```js
+import {restoreCurrentEvidence} from 'vantemio-agentic-backend/evidence-context';
+
+export async function assembleMessages(host, sessionID, nativeMessages) {
+  const before = await host.evidenceSnapshot(sessionID);
+  const projected = restoreCurrentEvidence({
+    ...before, messages: nativeMessages, maxEvidenceBytes: 262144,
+  });
+  // Reconcile SAME current task/Stop, original receipts and Source versions after async work.
+  await host.assertSnapshotStillCurrent(before);
+  // Trusted status metadata may be exposed by the host; contents stay in tool messages.
+  host.recordProjectionDecisions(projected.decisions);
+  return projected.messages;
+}
+```
+
+`decisions` are `current` with the original receipt/input and current proof IDs, or `historical_only` with a reason. Historical output must not be labelled as current Source/test evidence. This does not prohibit the model from reading necessary changed Source through the normal tools. Do not turn a stale-evidence decision into a retry of the original write/test/API call. Original `UNKNOWN`/live/error outcomes are retained as historical and remain subject to the host's existing unresolved-outcome guards. A context projection cannot release claims or authorize continuation.
+
+`maxEvidenceBytes` is an integer from 1 through 1048576. It bounds the sum of unique restored UTF-8 contents only, not the complete prompt or tokenizer estimate. Exceeding it rejects before output is changed; a host must select the necessary range/results explicitly, never pad for cache or silently truncate Source.

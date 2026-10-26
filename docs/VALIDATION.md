@@ -24,3 +24,9 @@ A requested/reported model name and reasoning setting do not attest the underlyi
 ## 0.2.0 task hook
 
 Fourteen new offline regression cases exercise a model-step/tool-step/model-step caller, changed files without recreating the hook, stable unchanged prefix, all five binding fields changing during a read, root/Goal/project-context changes, Stop at both boundaries, missing/oversized documents, invalid sessions and concurrent actor isolation. The caller is an isolated integration fixture; it does not claim a paid provider run or installation of the new hook in live chats. The earlier native deployment evidence belongs to the deployed document reader, not this newly exported wrapper.
+
+## 0.3.0 evidence projection
+
+Twenty-one additional cases cover exact Source-range reuse through an offline model/tool caller, changed Source invalidation, raw CRLF/Unicode SHA/ranges, binary/invalid reads, four task identity changes, current-input proofs, changed original receipts/content/call arguments, unresolved/live/error outcomes, missing messages, duplicate identities, multiple tested Source versions, Stop, byte overflow and preserving untrusted tool data outside system instructions. The caller counts owned reads: unchanged projections reuse the original result without another read; a changed version stops claiming that evidence is current. This is isolated integration evidence, not a live provider or universal protocol-compatibility claim.
+
+`npm run smoke:install` packs the real release tree, installs that archive into a temporary consumer using an empty npm cache and offline/no-scripts flags, and imports the public exports by package name. The installed consumer runs task refresh plus Source reuse across a local tool step, with no provider requests or developer-chat changes. Temporary installation files are removed afterwards.

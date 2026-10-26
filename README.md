@@ -15,6 +15,7 @@ git clone https://github.com/pavlichuckcrypt-maker/vantemio-agentic-backend.git
 cd vantemio-agentic-backend
 npm test
 npm run check:release
+npm run smoke:install
 ```
 
 Import the modules from `src/`, or install this repository as a local package. Configure a copy of `config/request-policy.example.json`. `loadClientRequestBudget(path)` requires an explicit file. `config/agent-profile.example.json` is a reference schema for your adapter, **not** an OpenCode configuration file to paste blindly.
@@ -32,7 +33,7 @@ Import the modules from `src/`, or install this repository as a local package. C
 
 | Path | Purpose |
 |---|---|
-| `src/` | Nine reusable policy/integration modules extracted/adapted from deployed code |
+| `src/` | Ten reusable policy/integration modules extracted/adapted from deployed code |
 | `config/` | Credential-free request/profile examples and exact upstream skill pins |
 | `test/` | Offline isolated regression tests |
 | `docs/INTEGRATION.md` | Runtime contracts and what remains deployment-specific |
@@ -42,6 +43,10 @@ Import the modules from `src/`, or install this repository as a local package. C
 ## Task context hook
 
 `createTaskContextTransform` from `vantemio-agentic-backend/task-context` connects the required-document reader to the host system-transform hook. Each call resolves the current task, reads its documents and rechecks actor/session/Goal/revision/input before appending the full Goal and project context. It preserves existing system entries and rejects Stop, changed bindings, missing documents or oversized context. See the runnable local adapter recipe in [INTEGRATION.md](docs/INTEGRATION.md#bound-system-transform). No provider request is dispatched by this hook.
+
+## Source and result continuity
+
+The `./evidence-context` export restores selected necessary Source/test output to the **same original tool message** after a host compactor replaces it with a reference. It checks original call arguments and receipt/content digests, task binding and current Source proofs. Changed Source or unresolved outcomes remain historical; nothing is rerun or promoted into system instructions. This adapter supports text tool results in the Chat Completions message shape, not every provider protocol. See [the integration contract](docs/INTEGRATION.md#source-and-result-continuity).
 
 ## Skills
 
