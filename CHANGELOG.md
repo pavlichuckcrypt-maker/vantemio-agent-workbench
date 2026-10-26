@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 — 2026-10-26
+
+Recognize the exact native `UnknownError` / `The operation timed out.` provider deadline in the existing bounded transient recovery policy. Bare tool timeouts, owner aborts, quota/key/model failures and unsettled tools remain excluded. Regression verifies exact error classification; native acceptance included a new successful assistant/read and subsequent ordinary step after safe shared backend loading, without replaying tools or changing the Goal/model.
+
 ## 0.3.0 — 2026-10-25
 
 Add portable Source/result capture and projection for existing Chat Completions text tool messages. Preserve exact original invocation/receipt and Source versions; changed/unresolved evidence remains historical without tool replay. Add 21 regression cases and RU/EN host integration contracts. No new storage authority, reader, watcher or live chat settings.
