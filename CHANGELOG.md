@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 — 2026-10-26
+
+Preserve already complete native trusted context without inserting a duplicate task block. Add explicit host-estimate admission while keeping unknown hard token bounds labelled unknown; strict upper bounds remain the default. Add one-pass Chat/Responses SSE usage observation, exact owned command-prefix normalization, and qualified local Source aliases for read retention. Protect original provider bytes, terminal failures, task/host bindings and physical path containment. Expand the suite to 115 cases and the offline installed-package consumer. Native enrollment, durable ledgers, permissions and Source authority remain host responsibilities; no cache percentage or uninterrupted provider service is promised.
+
 ## 0.4.0 — 2026-10-26
 
 Add a common prepare/dispatch-boundary/observe adapter, qualified serializer extension points and explicit original provider usage normalization. Preserve native model/output parameters and reasoning/tool identities; reject changed task/Source/documents, lifecycle uncertainty and mismatched original outcomes. Cache UNKNOWN and final-snapshot coverage stay explicit; historical cache never grants automatic input credit. Harden provider failure accounting by native session. **Migration:** `providerFailureState` now requires `sessionID` alongside provider/model. Installed-package consumer and four usage protocols are covered; live chat settings are unchanged by this release.

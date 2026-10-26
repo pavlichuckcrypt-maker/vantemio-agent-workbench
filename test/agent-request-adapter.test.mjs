@@ -230,3 +230,39 @@ test('native busy for the SAME proven unsent request is not confused with anothe
     await assert.rejects(client.beforeDispatch(prepared),/HELD_busy/);
   });
 });
+
+
+test('native context values can be reused byte-for-byte without adding a second Goal',async()=>{
+  await fixture(async({host,task,request,root})=>{
+    task.fullGoal=JSON.stringify({id:'goal-a',objective:'Full current Goal',criteria:['same task']});
+    task.projectContext='Authority with a newline\nand a quote "value"';
+    const technicalContract=await readFile(path.join(root,'TECHNICAL_TASK.md'),'utf8');
+    const requirements=await readFile(path.join(root,'REQUIREMENTS.md'),'utf8');
+    const payload={...request.payload,messages:[{role:'system',content:'Native contract\n'+technicalContract+'\n'+requirements},
+      {role:'system',content:JSON.stringify({goal:JSON.parse(task.fullGoal),authority:task.projectContext})},
+      {role:'user',content:'Same native input'}]};
+    const client=createAgentRequestAdapter({...host,policy,projectRequest:async({payload})=>({payload,evidenceDecisions:[],contextRepresentation:'native-values'})});
+    const prepared=await client.prepare({...request,payload});
+    assert.equal(prepared.serializedBody,JSON.stringify(payload));await client.beforeDispatch(prepared);
+    const demoted=structuredClone(payload);for(const message of demoted.messages)message.role='user';
+    await assert.rejects(client.prepare({...request,payload:demoted}),/TASK_CONTEXT_MISSING/);
+  });
+});
+
+test('local estimates remain explicitly unknown hard bounds and require exact host admission',async()=>{
+  await fixture(async({host,request})=>{
+    host.measureInput=async()=>({inputTokenUpperBound:null,estimatedInputTokens:20000,method:'qualified native local estimate'});
+    const options={...host,policy,allowHostEstimatedInput:true};
+    await assert.rejects(createAgentRequestAdapter({...options,allowHostEstimatedInput:false}).prepare(request),/MEASUREMENT_UNKNOWN/);
+    await assert.rejects(createAgentRequestAdapter(options).prepare(request),/BOUND_INPUT_ADMISSION_REQUIRED/);
+    options.assertSnapshotCurrent=async({prepared})=>({inputAdmission:{qualified:true,receiptID:'native-budget-a',binding:prepared.binding,
+      expectedTotalInputTokens:19000,expectedFreshInputTokens:15000,observationKind:'calibrated_estimate'}});
+    const client=createAgentRequestAdapter(options),prepared=await client.prepare(request);
+    assert.equal(prepared.preflight.inputTokenUpperBound,null);
+    assert.equal(prepared.preflight.measurementKind,'host_estimate');
+    assert.equal(prepared.hostInputAdmission.hardTokenBoundKnown,false);
+    await client.beforeDispatch(prepared);
+    const bad=structuredClone(prepared);bad.binding.requestSHA256='b'.repeat(64);
+    await assert.rejects(client.beforeDispatch(bad),/PREPARED_CONFLICT/);
+  });
+});

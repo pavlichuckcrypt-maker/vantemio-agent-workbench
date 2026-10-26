@@ -21,13 +21,16 @@ try {
   run([npm,'install','--offline','--ignore-scripts','--no-audit','--no-fund','--package-lock=false',archive],consumer);
   await writeFile(path.join(consumer,'verify.mjs'),`
 import assert from 'node:assert/strict';
-import {writeFile,readFile,mkdir} from 'node:fs/promises';
+import {writeFile,readFile,mkdir,symlink,realpath} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {createTaskContextTransform} from 'vantemio-agentic-backend/task-context';
 import {captureSourceReadEvidence,restoreCurrentEvidence} from 'vantemio-agentic-backend/evidence-context';
 import {createAgentRequestAdapter} from 'vantemio-agentic-backend/request-adapter';
 import {normalizeProviderUsage,aggregateProviderUsage} from 'vantemio-agentic-backend/usage';
+import {prefixCommandOnce} from 'vantemio-agentic-backend/command-prefix';
+import {observeUsageStream} from 'vantemio-agentic-backend/usage-stream';
+import {qualifySourceView,qualifySourceViewFile} from 'vantemio-agentic-backend/source-view';
 
 const workspaceRoot=path.join(process.cwd(),'task');
 await mkdir(workspaceRoot);
@@ -72,7 +75,20 @@ const result=adapter.observe(prepared,{binding:prepared.binding,receiptID:'usage
 assert.equal(result.observation.metrics.uncachedInputTokens,200);
 assert.equal(aggregateProviderUsage([result.observation,result.observation]).finalRequests,1);
 assert.equal(normalizeProviderUsage({format:'chat-completions',binding:prepared.binding,receiptID:'usage-b',observedAt:1,stage:'final',usage:{prompt_tokens:1000}}).metrics.cachedInputTokens,null);
-console.log(JSON.stringify({installedExports:true,taskRefresh:true,sourceReuse:true,requestAdapter:true,usageUnknownPreserved:true,providerRequests:0}));
+const sourceRoot=path.join(process.cwd(),'site-source'),viewRoot=path.join(workspaceRoot,'site');
+await mkdir(sourceRoot);await writeFile(path.join(sourceRoot,'module.mjs'),'export const answer = 42;');
+await symlink(sourceRoot,viewRoot,process.platform==='win32'?'junction':'dir');
+const qualifiedView=await qualifySourceView({binding:task.binding,expectedHost:'fixture-host',workspaceRoot,
+  declaredSourceRoots:[sourceRoot],ownerStop:false,view:{schema:'agent.source-view/v1',host:'fixture-host',binding:task.binding,viewRoot,sourceRoot}});
+const sourceFile=await qualifySourceViewFile(qualifiedView,path.join(viewRoot,'module.mjs'));
+assert.equal(sourceFile,await realpath(path.join(sourceRoot,'module.mjs')));
+assert.equal(qualifiedView.sourceOrClaimAuthority,false);
+assert.equal(prefixCommandOnce('owned-prefix; owned-prefix; run-local-check','owned-prefix; '),'owned-prefix; run-local-check');
+const wire='data: '+JSON.stringify({id:'stream-a',choices:[{finish_reason:'stop'}],usage:{prompt_tokens:1000,prompt_tokens_details:{cached_tokens:800}}})+'\\n\\ndata: [DONE]\\n\\n';
+const observed=[];const response=observeUsageStream(new Response(wire,{headers:{'content-type':'text/event-stream'}}),{onUsage:(row,completed)=>observed.push({row,completed})});
+assert.equal(await response.text(),wire);assert.equal(observed.at(-1).completed,true);
+assert.equal(observed.at(-1).row.usage.prompt_tokens,1000);
+console.log(JSON.stringify({installedExports:true,taskRefresh:true,sourceReuse:true,requestAdapter:true,usageUnknownPreserved:true,sourceView:true,streamObserver:true,prefixOnce:true,providerRequests:0}));
 `);
   const result = run([path.join(consumer,'verify.mjs')],consumer);
   console.log(result.trim());

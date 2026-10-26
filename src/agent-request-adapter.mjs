@@ -56,26 +56,62 @@ function verifyPrepared(prepared) {
   return usageBinding(prepared.binding);
 }
 
-function containsTaskContext(body,format,context) {
-  const has = value => typeof value==='string' && value.includes(context);
-  const blocks = value => has(value) || (Array.isArray(value) && value.some(x=>x?.type==='text' && has(x.text)));
+function trustedContextStrings(body,format) {
+  const blocks = value => typeof value==='string'?[value]:Array.isArray(value)?value.flatMap(x=>
+    ['text','input_text'].includes(x?.type) && typeof x.text==='string'?[x.text]:[]):[];
   if (format==='anthropic-messages') return blocks(body.system);
-  if (format==='responses') return has(body.instructions) || (Array.isArray(body.input) && body.input.some(m=>
-    ['system','developer'].includes(m?.role) && (has(m.content) || (Array.isArray(m.content) && m.content.some(c=>
-      ['input_text','text'].includes(c?.type) && has(c.text))))));
-  return Array.isArray(body.messages) && body.messages.some(m=>['system','developer'].includes(m?.role) && has(m.content));
+  if (format==='responses') return [...blocks(body.instructions),...(Array.isArray(body.input)?body.input:[])
+    .filter(m=>['system','developer'].includes(m?.role)).flatMap(m=>blocks(m.content))];
+  return (Array.isArray(body.messages)?body.messages:[]).filter(m=>['system','developer'].includes(m?.role))
+    .flatMap(m=>blocks(m.content));
 }
+
+function containsTaskContext(body,format,context,representation) {
+  const trusted=trustedContextStrings(body,format);
+  if (representation==='native-values') {
+    const required=JSON.parse(context);
+    return Object.values(required).every(value=>text(value) && trusted.some(s=>s.includes(value)||s.includes(JSON.stringify(value))));
+  }
+  if (representation!==undefined && representation!=='canonical-json') throw Error('AGENT_REQUEST_INVALID_CONTEXT_REPRESENTATION');
+  return trusted.some(s=>s.includes(context));
+}
+
+
 
 // One host integration, no transport/authentication/storage authority or retry loop.
 export function createAgentRequestAdapter({resolveTask,resolveEvidence,measureInput,assertSnapshotCurrent,projectRequest,
-  policy,format='chat-completions',maxTaskContextBytes=262144,maxEvidenceBytes=262144} = {}) {
+  policy,format='chat-completions',maxTaskContextBytes=262144,maxEvidenceBytes=262144,allowHostEstimatedInput=false} = {}) {
   if (![resolveTask,resolveEvidence,measureInput,assertSnapshotCurrent].every(x=>typeof x==='function') ||
       !['chat-completions','deepseek-chat','responses','anthropic-messages'].includes(format) ||
-      !Number.isSafeInteger(maxEvidenceBytes) || maxEvidenceBytes<1 || maxEvidenceBytes>1048576) throw Error('AGENT_REQUEST_INVALID_ADAPTER');
+      !Number.isSafeInteger(maxEvidenceBytes) || maxEvidenceBytes<1 || maxEvidenceBytes>1048576 ||
+      typeof allowHostEstimatedInput!=='boolean') throw Error('AGENT_REQUEST_INVALID_ADAPTER');
   if (projectRequest !== undefined && typeof projectRequest !== 'function') throw Error('AGENT_REQUEST_INVALID_ADAPTER');
   if (!projectRequest && ['responses','anthropic-messages'].includes(format)) throw Error('AGENT_REQUEST_QUALIFIED_SERIALIZER_REQUIRED');
   const budget=validateRequestBudget(policy ?? {});
   const transform=createTaskContextTransform({resolveTask,maxContextBytes:maxTaskContextBytes});
+  function measurement(value) {
+    if (!text(value?.method)) throw Error('AGENT_REQUEST_MEASUREMENT_UNKNOWN');
+    if (Number.isSafeInteger(value.inputTokenUpperBound) && value.inputTokenUpperBound>=0) {
+      return {inputTokenUpperBound:value.inputTokenUpperBound,estimatedInputTokens:null,measurementKind:'upper_bound',measurementMethod:value.method};
+    }
+    if (allowHostEstimatedInput && value.inputTokenUpperBound===null && Number.isSafeInteger(value.estimatedInputTokens) && value.estimatedInputTokens>=0) {
+      return {inputTokenUpperBound:null,estimatedInputTokens:value.estimatedInputTokens,measurementKind:'host_estimate',measurementMethod:value.method};
+    }
+    throw Error('AGENT_REQUEST_MEASUREMENT_UNKNOWN');
+  }
+  function inputAdmission(prepared,result) {
+    if (prepared.preflight.inputTokenUpperBound!==null) return null;
+    const admission=result?.inputAdmission;
+    if (!allowHostEstimatedInput || !admission || admission.qualified!==true || !text(admission.receiptID) ||
+        !same(usageBinding(admission.binding),prepared.binding) ||
+        !Number.isSafeInteger(admission.expectedTotalInputTokens) || admission.expectedTotalInputTokens<0 || admission.expectedTotalInputTokens>budget.maxInputTokens ||
+        !Number.isSafeInteger(admission.expectedFreshInputTokens) || admission.expectedFreshInputTokens<0 ||
+        admission.expectedFreshInputTokens>Math.min(admission.expectedTotalInputTokens,budget.maxFreshInputTokens) ||
+        admission.expectedTotalInputTokens-admission.expectedFreshInputTokens>budget.maxCachedInputTokens ||
+        !['native_estimate','calibrated_estimate'].includes(admission.observationKind)) throw Error('AGENT_REQUEST_BOUND_INPUT_ADMISSION_REQUIRED');
+    return {receiptID:admission.receiptID,expectedTotalInputTokens:admission.expectedTotalInputTokens,
+      expectedFreshInputTokens:admission.expectedFreshInputTokens,observationKind:admission.observationKind,hardTokenBoundKnown:false};
+  }
   function cacheAdmission(prepared, result) {
     if (!prepared.preflight.requiresHostCacheAdmission) return null;
     const admission=result?.cacheAdmission;
@@ -99,11 +135,12 @@ export function createAgentRequestAdapter({resolveTask,resolveEvidence,measureIn
     const context={system:[]};
     await transform(input,context);
     const evidence=jsonClone(await resolveEvidence({binding:before.binding}));
-    let body, decisions;
+    let body, decisions, representation;
     if (projectRequest) {
       const projected=await projectRequest({binding:before.binding,format,payload:jsonClone(original),
         taskContext:context.system.join('\n'),evidence:jsonClone(evidence),maxEvidenceBytes});
       body=jsonClone(projected?.payload);decisions=jsonClone(projected?.evidenceDecisions);
+      representation=projected?.contextRepresentation;
       if (!Array.isArray(decisions)) throw Error('AGENT_REQUEST_INVALID_PROJECTION');
     } else {
       body=original;
@@ -120,38 +157,38 @@ export function createAgentRequestAdapter({resolveTask,resolveEvidence,measureIn
     for (const key of new Set([...Object.keys(original),...Object.keys(body)])) {
       if (!contextKeys.includes(key) && !same(original[key],body[key])) throw Error('AGENT_REQUEST_PARAMETER_CHANGED');
     }
-    if (!containsTaskContext(body,format,context.system.join('\n'))) throw Error('AGENT_REQUEST_TASK_CONTEXT_MISSING');
+    if (!containsTaskContext(body,format,context.system.join('\n'),representation)) throw Error('AGENT_REQUEST_TASK_CONTEXT_MISSING');
     const serializedBody=JSON.stringify(body), serializedBytes=Buffer.byteLength(serializedBody,'utf8');
     if (serializedBytes > budget.maxSerializedTextBytes) throw Error('AGENT_REQUEST_SERIALIZED_BUDGET_EXCEEDED');
     // The host must supply a qualified tokenizer/upper bound for this exact payload/model.
-    const measured=await measureInput({serializedBody,providerID:before.providerID,modelID:before.modelID});
-    if (!Number.isSafeInteger(measured?.inputTokenUpperBound) || measured.inputTokenUpperBound < 0 || !text(measured.method)) {
-      throw Error('AGENT_REQUEST_MEASUREMENT_UNKNOWN');
-    }
-    if (measured.inputTokenUpperBound > budget.maxInputTokens) throw Error('AGENT_REQUEST_TOTAL_INPUT_BUDGET_EXCEEDED');
+    const measured=measurement(await measureInput({serializedBody,providerID:before.providerID,modelID:before.modelID}));
+    const count=measured.inputTokenUpperBound??measured.estimatedInputTokens;
+    if (count > budget.maxInputTokens) throw Error('AGENT_REQUEST_TOTAL_INPUT_BUDGET_EXCEEDED');
     if (!same(before,taskSnapshot(await resolveTask(input),sessionID,requestID))) throw Error('AGENT_REQUEST_TASK_CHANGED');
     const binding=usageBinding({...before.binding,providerID:before.providerID,modelID:before.modelID,
       requestID,requestSHA256:sha(serializedBody)});
     const prepared={schema:'agent-prepared-request/v1',binding,format,serializedBody,
       taskSnapshotSHA256:sha(JSON.stringify(before)),evidenceSnapshotSHA256:sha(JSON.stringify(evidence)),
       taskContextSHA256:sha(context.system.join('\n')),
-      preflight:{serializedBytes,inputTokenUpperBound:measured.inputTokenUpperBound,measurementMethod:measured.method,
-        historicalCacheCredit:0,requiresHostCacheAdmission:measured.inputTokenUpperBound>budget.maxFreshInputTokens},
+      preflight:{serializedBytes,...measured,requiresHostInputAdmission:measured.inputTokenUpperBound===null,
+        historicalCacheCredit:0,requiresHostCacheAdmission:count>budget.maxFreshInputTokens},
       evidenceDecisions:decisions};
     // Existing host owns fresh Source/CAS and consistent document/lifecycle snapshots.
     const admission=await assertSnapshotCurrent({task:before,evidence,prepared:structuredClone(prepared)});
+    prepared.hostInputAdmission=inputAdmission(prepared,admission);
     prepared.hostCacheAdmission=cacheAdmission(prepared,admission);
     if (!same(before,taskSnapshot(await resolveTask(input),sessionID,requestID))) throw Error('AGENT_REQUEST_TASK_CHANGED');
     Object.freeze(prepared.binding);
     Object.freeze(prepared.preflight);
     if (prepared.hostCacheAdmission) Object.freeze(prepared.hostCacheAdmission);
+    if (prepared.hostInputAdmission) Object.freeze(prepared.hostInputAdmission);
     prepared.evidenceDecisions=Object.freeze(prepared.evidenceDecisions.map(Object.freeze));
     return Object.freeze(prepared);
   }
 
   async function beforeDispatch(prepared) {
     const binding=verifyPrepared(prepared), input={sessionID:binding.sessionID,requestID:binding.requestID};
-    const bytes=Buffer.byteLength(prepared.serializedBody,'utf8'), count=prepared.preflight?.inputTokenUpperBound;
+    const bytes=Buffer.byteLength(prepared.serializedBody,'utf8'), count=prepared.preflight?.inputTokenUpperBound??prepared.preflight?.estimatedInputTokens;
     if (!Number.isSafeInteger(count) || count<0 || count>budget.maxInputTokens || bytes>budget.maxSerializedTextBytes ||
         bytes!==prepared.preflight.serializedBytes ||
         prepared.preflight.requiresHostCacheAdmission!==(count>budget.maxFreshInputTokens)) throw Error('AGENT_REQUEST_PREPARED_CONFLICT');
@@ -164,10 +201,13 @@ export function createAgentRequestAdapter({resolveTask,resolveEvidence,measureIn
     const context={system:[]};
     await transform(input,context);
     if (sha(context.system.join('\n'))!==prepared.taskContextSHA256) throw Error('AGENT_REQUEST_CONTEXT_CHANGED');
-    const measured=await measureInput({serializedBody:prepared.serializedBody,providerID:binding.providerID,modelID:binding.modelID});
-    if (measured?.inputTokenUpperBound!==count || measured?.method!==prepared.preflight.measurementMethod) throw Error('AGENT_REQUEST_MEASUREMENT_CHANGED');
+    const measured=measurement(await measureInput({serializedBody:prepared.serializedBody,providerID:binding.providerID,modelID:binding.modelID}));
+    if (measured.inputTokenUpperBound!==prepared.preflight.inputTokenUpperBound ||
+        measured.estimatedInputTokens!==(prepared.preflight.estimatedInputTokens??null) ||
+        measured.measurementMethod!==prepared.preflight.measurementMethod) throw Error('AGENT_REQUEST_MEASUREMENT_CHANGED');
     // No cached usage from another/earlier request is a grant for this dispatch.
     const admission=await assertSnapshotCurrent({task,evidence,prepared:structuredClone(prepared),dispatchBoundary:true});
+    inputAdmission(prepared,admission);
     cacheAdmission(prepared,admission);
     if (!same(task,taskSnapshot(await resolveTask(input),binding.sessionID,binding.requestID))) throw Error('AGENT_REQUEST_TASK_CHANGED');
     return {requestID:binding.requestID,requestSHA256:binding.requestSHA256};

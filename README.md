@@ -54,6 +54,8 @@ The `./evidence-context` export restores selected necessary Source/test output t
 
 See [the host contract and recipe](docs/REQUEST_ADAPTER.md) or [русское руководство](docs/REQUEST_ADAPTER.ru.md). `./usage` normalizes four explicit usage shapes and reports cache coverage without inventing missing counters or guaranteed percentages.
 
+`./usage-stream` observes Chat/Responses SSE while preserving the consumed provider bytes. `./command-prefix` removes repeated exact leading host prefixes. `./source-view` verifies an explicitly enrolled local alias for read retention without granting Source ownership; see [Source views](docs/SOURCE_VIEWS.md). Native serializers can preserve an already complete trusted context, and an explicit host-estimate mode keeps an unknown hard token bound labelled unknown. These remain host integration contracts, not automatic cache-hit guarantees.
+
 ## Skills
 
 `config/skills.lock.json` pins Cloudflare Security Audit/Workers Best Practices, Trail of Bits Differential Review/Sharp Edges, Anthropic Doc Coauthoring, Microsoft Playwright CLI, and four Superpowers engineering skills. Use the official installer for your agent, with the exact commit/path from the lock file. These are instruction packages, not correctness guarantees. Do not inject all their text into every request.

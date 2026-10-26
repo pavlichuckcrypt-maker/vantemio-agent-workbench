@@ -76,6 +76,31 @@ For `responses` or `anthropic-messages`, supply a qualified `projectRequest({bin
 
 Prepared output includes exact serialized bytes and SHA, bound native IDs, snapshot digests, measurement provenance, host cache admission and evidence decisions. It is frozen in memory. Before dispatch the adapter checks the SHA, lifecycle, task/evidence/documents and token bound again. Persist the prepared record in an authenticated existing ledger; a hash is not a signature or an admission grant.
 
+## Existing native context and tokenizer estimates
+
+A qualified custom projector can return `contextRepresentation: 'native-values'` when the existing serializer already includes the complete `fullGoal`, `projectContext`, `technicalContract` and `requirements`. The adapter verifies every value in trusted system/developer text (plain or JSON-escaped), without adding a second context block. A user/tool message cannot satisfy this check. This option preserves the host's native packet; it does not certify the host's serializer or Source proofs.
+
+Strict token upper bounds remain the default. A host with an existing calibrated estimator can explicitly set `allowHostEstimatedInput: true` and return `{inputTokenUpperBound: null, estimatedInputTokens, method}` from `measureInput`. Both snapshot checks must then return an exact bound `inputAdmission`:
+
+```js
+{inputAdmission: {
+  qualified: true, receiptID: 'existing-native-budget-receipt',
+  binding: prepared.binding,
+  expectedTotalInputTokens: 25000, expectedFreshInputTokens: 15000,
+  observationKind: 'calibrated_estimate' // or 'native_estimate'
+}}
+```
+
+Fresh, cached and total estimates must fit policy. `preflight.inputTokenUpperBound` remains `null` and `hostInputAdmission.hardTokenBoundKnown` remains `false`: a local tokenizer estimate is not a provider hard bound. This opt-in does not grant historical cache credit or replace a required `cacheAdmission`. Native final fences and actual provider usage remain authoritative.
+
+## Stream accounting, command prefixes and local Source aliases
+
+`observeUsageStream(response, {onUsage, onObserverError})` from `./usage-stream` observes Chat/Responses SSE in the same consumed stream. Original bytes, status and headers are forwarded; accounting callback failures cannot fail the generation. The callback receives `(snapshot, completed)` with original usage/model/response ID. Normalize using the original prepared binding and mark a snapshot final only when `completed` is true. An original terminal error stays failed even if later usage or `[DONE]` arrives. Non-SSE responses are untouched. Native Anthropic multi-event counter aggregation is outside this observer's contract.
+
+`prefixCommandOnce(command, ownedExactPrefix)` from `./command-prefix` adds one host-owned leading prefix and removes only repeated exact leading copies. It does not parse shell commands, authorize execution, or change occurrences inside a command. Qualify the existing original-action fences before integrating it.
+
+`./source-view` qualifies an explicitly enrolled local filesystem alias for read retention. It verifies task/host metadata, root realpaths and file containment; it grants no Source/write authority or machine attestation. See [Source view contracts](SOURCE_VIEWS.md).
+
 ## Original provider usage
 
 `normalizeProviderUsage` from `./usage` takes `{format, binding, receiptID, observedAt, stage, usage}`. Binding includes actor/session/Goal/revision/input/provider/model/request ID and `requestSHA256`; `observedAt` is the original observation's Unix milliseconds. `stage` is `partial` or `final`. Pass raw original provider counters, not default-zero native database summaries. A requested/reported model alias does not attest a physical model behind a proxy.

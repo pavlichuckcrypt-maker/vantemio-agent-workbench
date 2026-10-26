@@ -81,6 +81,31 @@ export async function runExistingNativeRequest(input) {
 
 Prepared record заморожен в памяти и содержит точные байты/SHA, binding, хэши снимков, измерение, квитанцию кэш-допуска и решения по evidence. Сохранять его в существующем аутентифицированном журнале. SHA — контроль целостности, а не подпись или право на отправку.
 
+## Уже подготовленный native-контекст и оценки токенов
+
+Проверенный custom projector может вернуть `contextRepresentation: 'native-values'`, когда штатный сериализатор уже передаёт полные `fullGoal`, `projectContext`, `technicalContract`, `requirements`. Адаптер проверяет каждое значение в доверенном system/developer-тексте, обычном или JSON-escaped, и не добавляет второй блок. User/tool-текст этой проверке не соответствует. Режим сохраняет native-пакет, но не аттестует чужой сериализатор или Source.
+
+По умолчанию требуется верхняя граница токенов. Host с существующим калиброванным оценщиком может явно включить `allowHostEstimatedInput: true` и вернуть из `measureInput` `{inputTokenUpperBound: null, estimatedInputTokens, method}`. Оба snapshot callback тогда обязаны вернуть:
+
+```js
+{inputAdmission: {
+  qualified: true, receiptID: 'existing-native-budget-receipt',
+  binding: prepared.binding,
+  expectedTotalInputTokens: 25000, expectedFreshInputTokens: 15000,
+  observationKind: 'calibrated_estimate' // либо 'native_estimate'
+}}
+```
+
+Оценки fresh/cache/total должны укладываться в политику. `preflight.inputTokenUpperBound` остаётся `null`, `hostInputAdmission.hardTokenBoundKnown` — `false`: локальная оценка не становится жёсткой границей провайдера. Режим не даёт автоматического исторического cache credit и не заменяет обязательный `cacheAdmission`. Окончательные native fences и фактический usage остаются обязательными.
+
+## Стрим, префиксы команд и локальные Source aliases
+
+`observeUsageStream(response, {onUsage, onObserverError})` из `./usage-stream` наблюдает Chat/Responses SSE в том же потребляемом стриме. Байты, status и headers сохраняются; сбой учёта не ломает генерацию. Callback получает `(snapshot, completed)` с исходными usage/model/response ID. Нормализовать по исходному prepared binding; final допустим только при `completed: true`. Terminal error сохраняется и после позднего usage/`[DONE]`. Не-SSE ответы не меняются. Агрегация раздельных native Anthropic events в этот контракт не входит.
+
+`prefixCommandOnce(command, ownedExactPrefix)` из `./command-prefix` оставляет один точный ведущий host-префикс. Вхождения внутри команды не меняются. Это не shell parser и не разрешение на выполнение; перед подключением проверить существующие original-action fences.
+
+`./source-view` проверяет явно зарегистрированный локальный filesystem alias для сохранения прочитанного контекста. Проверяются binding/host metadata, realpath корней и файлов. Прав на Source/write или аттестации машины это не даёт. См. [контракт Source views](SOURCE_VIEWS.ru.md).
+
 ## Исходный usage
 
 `normalizeProviderUsage` из `./usage` принимает `{format, binding, receiptID, observedAt, stage, usage}`. Binding дополнительно содержит provider/model/request ID и SHA фактического тела. `observedAt` — Unix milliseconds исходного наблюдения; `stage` — `partial` или `final`. Передавать исходные поля провайдера, а не нулевые default-поля базы. Имя модели от proxy само по себе не подтверждает физическую модель.
