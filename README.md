@@ -71,3 +71,5 @@ Submit changes on a branch, include behavioral regression tests and update `CHAN
 ## Security and license
 
 Report suspected vulnerabilities privately through GitHub's private reporting facility when enabled; otherwise contact the repository owner privately. Do not include credentials or private request bodies in issues. This project's code is MIT licensed. Upstream skills retain their own licenses and are linked, not vendored.
+
+Native recovery details and RU/EN guidance: [docs/NATIVE_RECOVERY.md](docs/NATIVE_RECOVERY.md).

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.3
+
+- Recognize interrupted empty native tool inputs as failed operations that were never dispatched; running, partial, provider-executed or unknown-effect tools remain protected.
+- Permit an explicitly configured necessary fresh-input ceiling up to50,000; smaller policies remain valid. Cache evidence and physical context are separate.
+- Add regression negatives and RU/EN native recovery guidance.
+
+
 ## 0.5.2 — 2026-10-26
 
 Classify the exact native unique-match edit rejection as a known failure before file mutation. Preserve original error/call/input/time, reject replaceAll, partial-output and unrelated mutation errors, and retain host identity/Stop/UNKNOWN/no-replay guards. Add public regressions, an installed-package ambiguous-edit consumer, and updated RU/EN integration contracts.

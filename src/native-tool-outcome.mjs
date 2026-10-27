@@ -3,6 +3,15 @@ const sha=value=>createHash('sha256').update(value).digest('hex');
 // A precise native validation rejection, not a general exception-to-success rule.
 export function knownNativeNoEffectFailure(part){
  const state=part?.state,input=state?.input,time=state?.time;
+ // OpenCode1.19.3 processor: input-start creates pending {input:{},raw:''};
+ // tool-call replaces it with running and REMOVES raw before execution.
+ // Cleanup of an untouched pending part assigns identical start/end. A
+ // running/partially specified/provider-executed operation never matches.
+ if(part?.type==='tool'&&['write','edit','apply_patch','bash','read'].includes(part.tool)&&/^call_[A-Za-z0-9_-]+$/.test(part.callID||'')&&state?.status==='error'&&state.error==='Tool execution aborted'&&Object.hasOwn(state,'raw')&&state.raw===''&&input&&typeof input==='object'&&!Array.isArray(input)&&Object.keys(input).length===0&&state.metadata?.interrupted===true&&Object.keys(state.metadata).every(k=>k==='interrupted')&&part.metadata?.providerExecuted!==true&&Number.isFinite(time?.start)&&time.start>0&&time.end===time.start&&!state.output&&!state.attachments&&!state.title){
+  return{status:'known_failed_before_execution',code:'NATIVE_EMPTY_TOOL_INPUT_ABORTED',operation:part.tool,originalCallID:part.callID,originalInputSHA256:sha(JSON.stringify(input)),originalErrorSHA256:sha(state.error),originalCompletedAt:time.end,operationDispatched:false,noOperationReplay:true,noReleaseApproval:true};
+ }
+
+
  if(part?.type!=='tool'||part.tool!=='edit'||!/^call_[A-Za-z0-9_-]+$/.test(part.callID||'')||state?.status!=='error'||typeof input?.filePath!=='string'||!input.filePath.trim()||/[\0\r\n]/.test(input.filePath)||typeof input.oldString!=='string'||typeof input.newString!=='string'||!Number.isFinite(time?.start)||!Number.isFinite(time?.end)||time.start<=0||time.end<time.start)return null;
  let code;
  if(state.error==='No changes to apply: oldString and newString are identical.'&&input.oldString===input.newString)code='NATIVE_EDIT_IDENTICAL_INPUT';
