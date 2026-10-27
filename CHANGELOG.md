@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — product naming and operations
+
+- Present the project as Vantemio Agent Workbench, a reliability toolkit for autonomous coding-agent development. Keep the technical package name and exports compatible.
+- Add RU/EN ownership, safe maintenance, exact-input reconciliation and normal-consumer acceptance guidance. Runtime code remains version 0.5.3.
+
+
 ## 0.5.3
 
 - Recognize interrupted empty native tool inputs as failed operations that were never dispatched; running, partial, provider-executed or unknown-effect tools remain protected.

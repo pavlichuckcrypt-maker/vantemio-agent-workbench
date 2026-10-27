@@ -1,8 +1,8 @@
-# Vantemio Agentic Backend
+# Vantemio Agent Workbench
 
-Provider-neutral **backend policy kit and host integration adapters** for autonomous coding agents. [Русский](docs/README.ru.md).
+**Reliability toolkit for autonomous development in OpenCode and other coding-agent hosts.** Provider-neutral policies, tested integration contracts and configuration examples. [Русский](docs/README.ru.md).
 
-This repository shares the reusable parts of our development backend: bounded continuation, original-outcome accounting, provider failure guards, lazy plugin enrollment, request pacing, fresh/cache budget validation, and a pinned catalog of ten upstream engineering/audit skills.
+Use this toolkit to connect task context, controlled recovery and original-result accounting to an existing agent runtime. This repository shares the reusable parts of our development infrastructure: bounded continuation, original-outcome accounting, provider failure guards, lazy plugin enrollment, request pacing, fresh/cache budget validation, and a pinned catalog of ten upstream engineering/audit skills.
 
 **Scope:** this is not a complete hosted agent, a drop-in OpenCode server, or the private Studio production system. The kit includes common task/context preparation, selected tool-result projection and usage accounting. Native authentication, enrollment, durable admission/storage, transport, peer identity and qualified provider-specific serializers still belong to the host. The policy library does not grant write authority or independently dispatch model requests. Do not deploy it as a replacement backend without testing those integrations.
 
@@ -11,8 +11,8 @@ This repository shares the reusable parts of our development backend: bounded co
 Node.js 22 or newer. No npm dependencies or install scripts.
 
 ```sh
-git clone https://github.com/pavlichuckcrypt-maker/vantemio-agentic-backend.git
-cd vantemio-agentic-backend
+git clone https://github.com/pavlichuckcrypt-maker/vantemio-agent-workbench.git
+cd vantemio-agent-workbench
 npm test
 npm run check:release
 npm run smoke:install
@@ -63,6 +63,12 @@ See [the host contract and recipe](docs/REQUEST_ADAPTER.md) or [русское �
 ## Skills
 
 `config/skills.lock.json` pins Cloudflare Security Audit/Workers Best Practices, Trail of Bits Differential Review/Sharp Edges, Anthropic Doc Coauthoring, Microsoft Playwright CLI, and four Superpowers engineering skills. Use the official installer for your agent, with the exact commit/path from the lock file. These are instruction packages, not correctness guarantees. Do not inject all their text into every request.
+
+## Autonomous operation
+
+Assign one infrastructure maintainer in your existing agent host. It owns shared policy improvements, fleet regression checks and reviewed public updates; product agents keep their own tasks. Load changes at a verified idle boundary, reconcile every maintenance interruption and confirm a normal assistant/tool step afterward. Do not leave agents in a maintenance hold or treat an accepted resume as completed recovery. See the [operating guide](docs/OPERATIONS.md) and [русское руководство](docs/OPERATIONS.ru.md).
+
+The technical package identifier remains `vantemio-agentic-backend` for compatibility with existing imports. The product and repository name is **Vantemio Agent Workbench**.
 
 ## Updates
 

@@ -3,7 +3,7 @@
   "version": "0.5.3",
   "private": true,
   "type": "module",
-  "description": "Provider-neutral agent backend policies, configuration templates and pinned skill integrations",
+  "description": "Reliability toolkit for autonomous development in OpenCode and other coding-agent hosts",
   "license": "MIT",
   "engines": {
     "node": ">=22"
