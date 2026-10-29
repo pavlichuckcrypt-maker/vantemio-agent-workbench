@@ -50,6 +50,29 @@ export async function reconcileVerifiedOriginal({original, readCurrent, verifyOr
     binding: source.binding, inputSHA256, receiptID: verified.receiptID, receiptSHA256: verified.receiptSHA256,
     originalCompletedAt: verified.originalCompletedAt, noOperationReplay: true, noReleaseApproval: true,
     claimsReleased: false, sourceSnapshotNotFreshAuthority: true, descendantCompletionNotInferred: true};
+  if (outcome.kind === 'read_failed' || outcome.kind === 'read_completed') {
+    if (!['read', 'source_read'].includes(source.tool) || outcome.operation !== 'read'
+        || outcome.readonlyQualified !== true || outcome.dispatched !== true
+        || outcome.readOperationTerminal !== true || outcome.timedOut === true) {
+      return unresolved('read_completion_not_verified');
+    }
+    if (outcome.kind === 'read_failed') {
+      if (typeof outcome.error !== 'string' || !outcome.error.trim()
+          || Buffer.byteLength(outcome.error) > maxOutputBytes) return unresolved('read_failure_not_verified');
+      return {...common, kind: 'known_read_failed', operationCompleted: true,
+        readOperationTerminal: true, usableReadResult: false, originalError: outcome.error};
+    }
+    if (outcome.error != null || !['file', 'directory'].includes(outcome.entryType) || typeof outcome.output !== 'string'
+        || Buffer.byteLength(outcome.output) > maxOutputBytes) return unresolved('read_result_not_verified');
+    if (outcome.entryType === 'file' && !hex(outcome.sourceSHA256)) return unresolved('read_source_digest_required');
+    if (outcome.entryType === 'directory' && outcome.sourceSHA256 !== undefined) {
+      return unresolved('directory_is_not_source_code');
+    }
+    return {...common, kind: 'known_read_completed', operationCompleted: true,
+      readOperationTerminal: true, usableReadResult: true, originalOutput: outcome.output,
+      metadataOnly: outcome.entryType === 'directory',
+      ...(outcome.entryType === 'file' ? {sourceSHA256: outcome.sourceSHA256} : {sourceSHA256Unknown: true})};
+  }
   if (outcome.kind === 'completed') {
     if (outcome.dispatched !== true || outcome.executionClosed !== true || outcome.timedOut === true
         || !Number.isSafeInteger(outcome.exitCode) || typeof outcome.output !== 'string'

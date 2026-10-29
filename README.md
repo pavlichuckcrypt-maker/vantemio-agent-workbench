@@ -64,6 +64,8 @@ See [the host contract and recipe](docs/REQUEST_ADAPTER.md) or [русское �
 
 Version0.6.0 adds authenticated original-result reconciliation, a byte-bounded proof cache, Stop-safe continuation transactions, completed maintenance qualification, explicit Source previews and progress signals. These host integration components preserve native model/provider choice and never replay UNKNOWN operations. See [the integration contract](docs/RUNTIME_CONTINUITY.md) and [русское руководство](docs/RUNTIME_CONTINUITY.ru.md).
 
+Version0.6.1 adds selection of complete observed task-document ranges and authenticated terminal read outcomes. It addresses excerpt/offload reread loops without treating file-not-found failures or directory metadata as successful code review. See [task context and read recovery](docs/CONTEXT-AND-READ-RECOVERY.md) and [русское руководство](docs/CONTEXT-AND-READ-RECOVERY.ru.md).
+
 ## Skills
 
 `config/skills.lock.json` pins Cloudflare Security Audit/Workers Best Practices, Trail of Bits Differential Review/Sharp Edges, Anthropic Doc Coauthoring, Microsoft Playwright CLI, and four Superpowers engineering skills. Use the official installer for your agent, with the exact commit/path from the lock file. These are instruction packages, not correctness guarantees. Do not inject all their text into every request.

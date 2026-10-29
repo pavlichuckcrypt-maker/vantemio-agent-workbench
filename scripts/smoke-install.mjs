@@ -26,6 +26,7 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {createTaskContextTransform} from 'vantemio-agentic-backend/task-context';
 import {captureSourceReadEvidence,restoreCurrentEvidence} from 'vantemio-agentic-backend/evidence-context';
+import {collectRequiredTaskDocuments} from 'vantemio-agentic-backend/task-documents';
 import {createAgentRequestAdapter} from 'vantemio-agentic-backend/request-adapter';
 import {normalizeProviderUsage,aggregateProviderUsage} from 'vantemio-agentic-backend/usage';
 import {prefixCommandOnce} from 'vantemio-agentic-backend/command-prefix';
@@ -46,6 +47,9 @@ const originalBinding={actorID:'actor-a',sessionID:'session-a',goalID:'goal-a',r
 const invocation={binding:originalBinding,requestID:'request-a',callID:'call-a',tool:'exec',input:{command:'local-test'}};
 const restored=await reconcileVerifiedOriginal({original:invocation,readCurrent:async()=>({binding:originalBinding,ownerStop:false,complete:false}),verifyOriginal:async row=>({...row,qualified:true,signatureVerified:true,originalOnly:true,receiptID:'receipt-a',receiptSHA256:'b'.repeat(64),originalCompletedAt:1,outcome:{kind:'completed',dispatched:true,executionClosed:true,exitCode:2,output:'known failed check'}})});
 assert.equal(restored.kind,'known_execution_failed');assert.equal(restored.noOperationReplay,true);assert.equal(qualifyContinuationSnapshot({}),false);assert.equal(qualifyCompletedMaintenanceHold({}),false);
+const failedRead={...invocation,tool:'read',input:{filePath:'/project/missing.mjs'}};
+const readFailure=await reconcileVerifiedOriginal({original:failedRead,readCurrent:async()=>({binding:originalBinding,ownerStop:false,complete:false}),verifyOriginal:async row=>({...row,qualified:true,signatureVerified:true,originalOnly:true,receiptID:'read-receipt',receiptSHA256:'c'.repeat(64),originalCompletedAt:2,outcome:{kind:'read_failed',operation:'read',readonlyQualified:true,dispatched:true,readOperationTerminal:true,error:'File not found'}})});
+assert.equal(readFailure.kind,'known_read_failed');assert.equal(readFailure.usableReadResult,false);
 const readText='<path>/project/source.mjs</path>\\n<type>file</type>\\n<content>\\n'+Array.from({length:40},(_,i)=>(i+1)+': source line '+i+'\\n').join('')+'</content>';
 const preview=formatReadPreview(readText,{file:'/project/archive/read.txt',sha256:createHash('sha256').update(readText).digest('hex'),callID:'read-a'},4);
 assert.equal(JSON.parse(preview.split('\\n')[0]).incompleteSourcePreview,true);assert.equal(qualifiedProgressFacts([]).length,0);
@@ -78,6 +82,11 @@ assert.equal(JSON.parse(next.system[1]).fullGoal,task.fullGoal);
 assert.equal(projected.messages[1].content,bytes.toString('utf8'));
 assert.equal(projected.decisions[0].status,'current');
 assert.equal(messages[1].content,'Original read reference');
+const docPath=path.join(workspaceRoot,'TECHNICAL_TASK.md'),docBytes=await readFile(docPath);
+const docCall={id:'task-read',type:'function',function:{name:'read',arguments:JSON.stringify({filePath:docPath})}};
+const docRecord=captureSourceReadEvidence({binding:task.binding,toolCall:docCall,receiptID:'task-receipt',sourcePath:docPath,sourceBytes:docBytes,range:{startLine:1,endLine:1}});
+const documents=collectRequiredTaskDocuments({binding:task.binding,ownerStop:false,requiredPaths:[docPath],records:[docRecord],originalResults:[docRecord.original],currentSources:[{binding:task.binding,path:docPath,sha256:docRecord.original.sources[0].sha256,proofID:'task-proof'}],messages:[{role:'assistant',tool_calls:[docCall]},{role:'tool',tool_call_id:docCall.id,content:'shortened reference'}],maxEvidenceBytes:262144,maxDocumentBytes:32768});
+assert.equal(documents.documents[0].content,'Verify the implemented consumer');assert.deepEqual(documents.requiredCallIDs,['task-read']);
 const policy=${await readFile(path.join(root,'config/request-policy.example.json'),'utf8')};
 const adapter=createAgentRequestAdapter({policy,resolveTask:async()=>task,
   resolveEvidence:async()=>({records:[record],originalResults:[original],currentSources:[{binding:task.binding,path:'module.mjs',sha256:createHash('sha256').update(bytes).digest('hex'),proofID:'current-version-a'}]}),
@@ -115,7 +124,7 @@ assert.equal(knownNativeNoEffectFailure({...rejectedPart,state:{...rejectedPart.
 const ambiguousPart={...rejectedPart,callID:'call_installed_ambiguous',state:{...rejectedPart.state,error:'Found multiple matches for oldString. Provide more surrounding context to make the match unique.',input:{...rejectedPart.state.input,newString:'changed'}}};
 assert.equal(knownNativeNoEffectFailure(ambiguousPart).code,'NATIVE_EDIT_AMBIGUOUS_PREWRITE');
 assert.equal(knownNativeNoEffectFailure({...ambiguousPart,state:{...ambiguousPart.state,input:{...ambiguousPart.state.input,replaceAll:true}}}),null);
-console.log(JSON.stringify({installedExports:true,runtimeContinuity:true,taskRefresh:true,sourceReuse:true,requestAdapter:true,usageUnknownPreserved:true,sourceView:true,streamObserver:true,prefixOnce:true,knownNativeNoEffect:true,providerRequests:0}));
+console.log(JSON.stringify({installedExports:true,runtimeContinuity:true,taskRefresh:true,taskDocumentRanges:true,readTerminalFailure:true,sourceReuse:true,requestAdapter:true,usageUnknownPreserved:true,sourceView:true,streamObserver:true,prefixOnce:true,knownNativeNoEffect:true,providerRequests:0}));
 `);
   const result = run([path.join(consumer,'verify.mjs')],consumer);
   console.log(result.trim());
