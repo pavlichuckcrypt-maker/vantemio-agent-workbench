@@ -10,3 +10,5 @@ This repository does not redistribute upstream skill contents or third-party npm
 - https://github.com/obra/superpowers
 
 Read each upstream repository's license at the pinned commit before installing or redistributing it. Their licenses are not replaced by this project's MIT license. Playwright CLI, OpenCode, tokenizers and context-pruning plugins are not bundled. Existing deployment uses its own pinned integration versions; consumers must test their own native host compatibility.
+
+The optional Harness context integration imports the SDK already installed by its host. It does not redistribute Harness, pi-ai or provider SDK packages. Native test fixtures use those installed serializers with HTTP disabled; their upstream licenses remain unchanged.

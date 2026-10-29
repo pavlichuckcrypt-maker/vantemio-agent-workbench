@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.1 — 2026-10-29
+
+- Preserve the native root contract at the qualified Harness/pi-ai request boundary without changing frozen caller options, model/provider/auth or already prepared calls.
+- Add an explicit SDK qualifier, portable regressions and optional installed-SDK tests that capture Responses, Completions and Anthropic payloads before HTTP.
+- Qualify a trusted owner scope clause independently of unrelated document/cache settings; missing or changed scope remains unqualified.
+- Add RU/EN integration instructions and installed-package export checks. Private deployment state and Studio sources are excluded.
+
+- Qualified current native task artifacts can be restored at the provider boundary when the frozen input omitted them; exact task/Goal/filesystem bindings and source roles remain checked.
+- Root wrapper cleanup uses native scoped effects, with safe predecessor qualification and prepared-call preservation. No private fleet adapters or operational histories are included.
+
 ## 0.6.0 — 2026-10-28
 
 - Preserve authenticated active working Source across historical read-budget demotions, with changed-input/hash negatives.

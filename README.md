@@ -64,6 +64,10 @@ See [the host contract and recipe](docs/REQUEST_ADAPTER.md) or [русское �
 
 Version0.6.0 adds authenticated original-result reconciliation, a byte-bounded proof cache, Stop-safe continuation transactions, completed maintenance qualification, explicit Source previews and progress signals. These host integration components preserve native model/provider choice and never replay UNKNOWN operations. See [the integration contract](docs/RUNTIME_CONTINUITY.md) and [русское руководство](docs/RUNTIME_CONTINUITY.ru.md).
 
+## Native root context
+
+Version0.6.1 includes a qualified Harness/pi-ai context plugin that keeps the root contract in the final provider body, preserves frozen/native controls and leaves already prepared calls untouched. Current native task documents can be restored at the provider boundary with exact task/Goal/file bindings; scoped cleanup preserves prepared calls. A separate owner-scope proof avoids disabling a guard when unrelated cache/document settings change. See [the host contract](docs/HARNESS_ROOT_CONTEXT.md) or [русское руководство](docs/HARNESS_ROOT_CONTEXT.ru.md). Optional installed-SDK tests capture three protocol payloads before HTTP; no real key is needed.
+
 ## Skills
 
 `config/skills.lock.json` pins Cloudflare Security Audit/Workers Best Practices, Trail of Bits Differential Review/Sharp Edges, Anthropic Doc Coauthoring, Microsoft Playwright CLI, and four Superpowers engineering skills. Use the official installer for your agent, with the exact commit/path from the lock file. These are instruction packages, not correctness guarantees. Do not inject all their text into every request.

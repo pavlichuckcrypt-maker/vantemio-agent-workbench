@@ -4,7 +4,7 @@
   "globalGapMs": 15000,
   "maxInputTokens": 80000,
   "maxSerializedTextBytes": 1048576,
-  "maxFreshInputTokens": 35000,
+  "maxFreshInputTokens": 50000,
   "maxCachedInputTokens": 70000,
   "targetFreshInputTokens": 15000,
   "cacheEvidenceMaxAgeMs": 3600000

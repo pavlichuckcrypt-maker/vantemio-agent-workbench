@@ -32,6 +32,16 @@ import {prefixCommandOnce} from 'vantemio-agentic-backend/command-prefix';
 import {observeUsageStream} from 'vantemio-agentic-backend/usage-stream';
 import {qualifySourceView,qualifySourceViewFile} from 'vantemio-agentic-backend/source-view';
 import {knownNativeNoEffectFailure} from 'vantemio-agentic-backend/native-tool-outcome';
+import {preserveNativeRoot} from 'vantemio-agentic-backend/harness-root-context';
+import {qualifyOwnerScopeClause} from 'vantemio-agentic-backend/scope-policy';
+import {qualifyTaskArtifact,stableTaskArtifactPrefix} from 'vantemio-agentic-backend/task-artifact-view';
+import {collectArtifacts} from 'vantemio-agentic-backend/current-task-artifacts';
+assert.equal(typeof qualifyTaskArtifact,'function');assert.equal(typeof stableTaskArtifactPrefix,'function');assert.equal(typeof collectArtifacts,'function');
+const rootInput=Object.freeze({provider:'chosen',model:'chosen',messages:Object.freeze([{role:'system',content:[{type:'text',text:'Root contract'}]},{role:'user',content:[{type:'text',text:'Current task'}]}])});
+assert.equal(preserveNativeRoot(rootInput).options.messages[0].role,'developer');
+assert.equal(rootInput.messages[0].role,'system');
+const ownerClause='Keep the current source scope.';
+assert.equal(qualifyOwnerScopeClause({policyText:ownerClause,expectedClauseSHA256:createHash('sha256').update(ownerClause).digest('hex'),extractClause:x=>x}).qualified,true);
 
 import {createBoundedProofCache} from 'vantemio-agentic-backend/proof-cache';
 import {originalInputSHA256,reconcileVerifiedOriginal} from 'vantemio-agentic-backend/original-outcome';

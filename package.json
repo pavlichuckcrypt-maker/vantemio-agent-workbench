@@ -1,6 +1,6 @@
 {
   "name": "vantemio-agentic-backend",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "type": "module",
   "description": "Reliability toolkit for autonomous development in OpenCode and other coding-agent hosts",
@@ -11,7 +11,8 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "check:release": "node scripts/check-release.mjs",
-    "smoke:install": "node scripts/smoke-install.mjs"
+    "smoke:install": "node scripts/smoke-install.mjs",
+    "test:native-root": "node --test test/native-sdk/*.test.mjs"
   },
   "exports": {
     "./continuation": "./src/continuation-policy.mjs",
@@ -36,7 +37,11 @@
     "./maintenance-hold": "./src/maintenance-hold.mjs",
     "./source-presentation": "./src/source-presentation.mjs",
     "./original-outcome": "./src/original-outcome.mjs",
-    "./active-read-context": "./src/active-read-context.mjs"
+    "./active-read-context": "./src/active-read-context.mjs",
+    "./harness-root-context": "./src/harness-root-context.mjs",
+    "./scope-policy": "./src/scope-policy.mjs",
+    "./task-artifact-view": "./src/task-artifact-view.mjs",
+    "./current-task-artifacts": "./src/current-task-artifacts.mjs"
   },
   "files": [
     "src",
@@ -45,6 +50,7 @@
     "README.md",
     "LICENSE",
     "THIRD_PARTY.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "scripts/qualify-harness-root.mjs"
   ]
 }

@@ -1,0 +1,4 @@
+import path from 'node:path';import{readFile}from'node:fs/promises';import{pathToFileURL}from'node:url';import{createHash}from'node:crypto';
+const [moduleRoot,stateRoot]=process.argv.slice(2);if(!moduleRoot||!stateRoot||!path.isAbsolute(moduleRoot)||!path.isAbsolute(stateRoot))throw Error('Use explicit absolute SDK node_modules and host-owned state directories on the actual native host');
+const source=path.join(moduleRoot,'@deepseek-ai/dsh-llm-pi-ai/lib/index.js');const{PiAiAdapter}=await import(pathToFileURL(source).href);const sha=x=>createHash('sha256').update(x).digest('hex');
+console.log(JSON.stringify({moduleRoot,stateRoot,expectedAdapterModuleSHA256:sha(await readFile(source)),expectedPrepareSHA256:sha(PiAiAdapter.prototype.prepareCall.toString()),expectedStreamSHA256:sha(PiAiAdapter.prototype.stream.toString())},null,2));

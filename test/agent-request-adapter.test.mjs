@@ -102,12 +102,12 @@ test('Source proof, Goal text and task documents are revalidated after pacing',a
 
 test('large input gets no historical cache credit and requires the host cache admission',async()=>{
   await fixture(async({host,adapter,request})=>{
-    host.measureInput=async()=>({inputTokenUpperBound:40000,method:'fixture upper bound'});
+    host.measureInput=async()=>({inputTokenUpperBound:policy.maxFreshInputTokens+5000,method:'fixture upper bound'});
     await assert.rejects(adapter().prepare(request),/HOST_CACHE_ADMISSION_REQUIRED/);
     host.assertSnapshotCurrent=async info=>{assert.equal(info.prepared.preflight.historicalCacheCredit,0);return {cacheAdmission:{qualified:true,receiptID:'cache-admission-a',binding:info.prepared.binding,expectedFreshInputTokens:15000,observationKind:'bound_prefix_estimate'}}};
     const prepared=await adapter().prepare(request);
     assert.equal(prepared.preflight.requiresHostCacheAdmission,true);
-    assert.equal(prepared.preflight.inputTokenUpperBound,40000);
+    assert.equal(prepared.preflight.inputTokenUpperBound,policy.maxFreshInputTokens+5000);
     host.assertSnapshotCurrent=async()=>undefined;
     await assert.rejects(adapter().prepare(request),/BOUND_CACHE_ADMISSION_REQUIRED/);
   });
@@ -154,7 +154,7 @@ test('immutable prepared bytes and exact outcome binding preserve original accou
 test('provider-reported fresh overflow is recorded, never hidden or retried',async()=>{
   await fixture(async({adapter,request})=>{
     const client=adapter(), prepared=await client.prepare(request);
-    const result=client.observe(prepared,{binding:prepared.binding,receiptID:'r',observedAt:1,stage:'final',usage:{prompt_tokens:40000,prompt_tokens_details:{cached_tokens:0}}});
+    const result=client.observe(prepared,{binding:prepared.binding,receiptID:'r',observedAt:1,stage:'final',usage:{prompt_tokens:policy.maxFreshInputTokens+5000,prompt_tokens_details:{cached_tokens:0}}});
     assert.equal(result.budgetObservation.freshInputExceeded,true);
     assert.equal(result.budgetObservation.retryAuthorized,false);
   });
