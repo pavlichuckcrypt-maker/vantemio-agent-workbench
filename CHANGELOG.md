@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.3 — 2026-10-29
+
+- Distinguish authenticated native edit no-match rejection from an uncertain write; preserve original failures, native opaque call IDs, owner Stop and no-replay.
+- Refuse unbound provider generation before dispatch when context hooks are absent; leave binding authentication and admission to the existing host.
+- Preserve all values in structured JSON read snapshots with an integrity-checked readable representation, avoiding nested escaping of Source code.
+- Support both XML and JSON native skill catalogs while deferring only locations, with names and complete descriptions preserved.
+- Add conservative graph-envelope and exact client/remote-read planning helpers; no inferred project, permission, recursive filesystem execution, or automatic side-effect replay.
+- Document final packet ordering, Source version qualification and native hook/tool readiness. Private host adapters and production evidence are excluded.
+
 ## 0.6.2 - 2026-10-29
 
 - Preserve verified current-task Source priority at soft context targets; unrelated historical evidence remains optional and hard admission remains unchanged.

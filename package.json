@@ -1,6 +1,6 @@
 {
   "name": "vantemio-agentic-backend",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "private": true,
   "type": "module",
   "description": "Reliability toolkit for autonomous development in OpenCode and other coding-agent hosts",
@@ -42,7 +42,11 @@
     "./scope-policy": "./src/scope-policy.mjs",
     "./task-artifact-view": "./src/task-artifact-view.mjs",
     "./current-task-artifacts": "./src/current-task-artifacts.mjs",
-    "./task-source-priority": "./src/task-source-priority.mjs"
+    "./task-source-priority": "./src/task-source-priority.mjs",
+    "./generation-binding-guard": "./src/generation-binding-guard.mjs",
+    "./structured-read-presentation": "./src/structured-read-presentation.mjs",
+    "./skill-catalog-presentation": "./src/skill-catalog-presentation.mjs",
+    "./tool-read-boundary": "./src/tool-read-boundary.mjs"
   },
   "files": [
     "src",

@@ -22,3 +22,9 @@ In addition, the exact `Found multiple matches for oldString. Provide more surro
 Other arguments or error text, another tool (including a Station edit), missing identity/path/time, running/pending state or inconsistent timestamps return `null`. Other errors require their own original-outcome investigation. Do not ignore all edit errors or infer no effects merely from an error status.
 
 This pure module hashes supplied data. It reads no files, dispatches no model/tool, creates no controller or timer, and grants no Source or publication authority.
+
+## Native no-match rejection
+
+The exact native edit no-match error returns `NATIVE_EDIT_NO_MATCH_PREWRITE` only for terminal, timed, authenticated native edit arguments, a nonempty old string, a different replacement, and no partial output, attachments or write-effect metadata. The original error remains FAIL. This does not authorize retrying the same edit: the developer must inspect the needed current file range and construct a separately admitted correction. The [qualified native implementation](https://github.com/anomalyco/opencode/blob/v1.19.3/packages/opencode/src/tool/edit.ts) calls replacement validation before file writing.
+
+Native provider call IDs are opaque identities, not a fixed vendor prefix. Preserve their exact bytes and authenticate them against the host record. Missing, oversized or control-bearing IDs are not qualified. Unrelated mutation errors and uncertain effects retain their existing fences.

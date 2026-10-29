@@ -70,6 +70,8 @@ Version0.6.1 includes a qualified Harness/pi-ai context plugin that keeps the ro
 
 Version0.6.2 adds selection of complete observed task-document ranges and authenticated terminal read outcomes. It also returns verified current-task Source priority so a soft context target does not discard necessary code and cause another read. Hard admission and owner Stop remain enforced. It addresses excerpt/offload reread loops without treating file-not-found failures or directory metadata as successful code review. See [task context and read recovery](docs/CONTEXT-AND-READ-RECOVERY.md) and [русское руководство](docs/CONTEXT-AND-READ-RECOVERY.ru.md).
 
+Version0.6.3 adds integrity-preserving structured Source-read presentation, XML/JSON skill metadata deferral, an unbound-generation transport guard and exact native edit no-match classification. Host integration is required; installing a package does not prove a live context hook or provider cache hit. See [final packet integration](docs/FINAL_PACKET.md) and [русское руководство](docs/FINAL_PACKET.ru.md).
+
 ## Skills
 
 `config/skills.lock.json` pins Cloudflare Security Audit/Workers Best Practices, Trail of Bits Differential Review/Sharp Edges, Anthropic Doc Coauthoring, Microsoft Playwright CLI, and four Superpowers engineering skills. Use the official installer for your agent, with the exact commit/path from the lock file. These are instruction packages, not correctness guarantees. Do not inject all their text into every request.
