@@ -68,6 +68,8 @@ Version0.6.0 adds authenticated original-result reconciliation, a byte-bounded p
 
 Version0.6.1 includes a qualified Harness/pi-ai context plugin that keeps the root contract in the final provider body, preserves frozen/native controls and leaves already prepared calls untouched. Current native task documents can be restored at the provider boundary with exact task/Goal/file bindings; scoped cleanup preserves prepared calls. A separate owner-scope proof avoids disabling a guard when unrelated cache/document settings change. See [the host contract](docs/HARNESS_ROOT_CONTEXT.md) or [русское руководство](docs/HARNESS_ROOT_CONTEXT.ru.md). Optional installed-SDK tests capture three protocol payloads before HTTP; no real key is needed.
 
+Version0.6.2 adds selection of complete observed task-document ranges and authenticated terminal read outcomes. It addresses excerpt/offload reread loops without treating file-not-found failures or directory metadata as successful code review. See [task context and read recovery](docs/CONTEXT-AND-READ-RECOVERY.md) and [русское руководство](docs/CONTEXT-AND-READ-RECOVERY.ru.md).
+
 ## Skills
 
 `config/skills.lock.json` pins Cloudflare Security Audit/Workers Best Practices, Trail of Bits Differential Review/Sharp Edges, Anthropic Doc Coauthoring, Microsoft Playwright CLI, and four Superpowers engineering skills. Use the official installer for your agent, with the exact commit/path from the lock file. These are instruction packages, not correctness guarantees. Do not inject all their text into every request.
