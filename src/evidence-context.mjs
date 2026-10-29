@@ -1,3 +1,4 @@
+import {prioritizeCurrentTaskSources} from './task-source-priority.mjs';
 import {createHash} from 'node:crypto';
 
 const sha = value => createHash('sha256').update(value).digest('hex');
@@ -74,7 +75,7 @@ export function captureSourceReadEvidence({binding:scope, toolCall, receiptID, s
 
 // Projection only: never writes native history, reads Source, dispatches or retries a tool.
 export function restoreCurrentEvidence({binding:scope, ownerStop, records, originalResults,
-  currentSources, messages, maxEvidenceBytes}) {
+  currentSources, messages, maxEvidenceBytes, task, nativeTask}) {
   const current = binding(scope);
   if (typeof ownerStop !== 'boolean') throw Error('EVIDENCE_STOP_STATE_REQUIRED');
   if (ownerStop) throw Error('EVIDENCE_OWNER_STOP');
@@ -136,5 +137,6 @@ export function restoreCurrentEvidence({binding:scope, ownerStop, records, origi
   }
   const projected = structuredClone(messages);
   for (const [at, content] of replacements) projected[at].content = content;
-  return {messages:projected, decisions, evidenceBytes:bytes};
+  return {messages:projected, decisions, evidenceBytes:bytes,
+    taskSourcePriorityCallIDs:prioritizeCurrentTaskSources({binding:current,task,nativeTask,ownerStop,records,decisions})};
 }

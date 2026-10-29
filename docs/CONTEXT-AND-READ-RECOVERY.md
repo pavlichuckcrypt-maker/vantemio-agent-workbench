@@ -44,3 +44,17 @@ After host integration, inspect the next ordinary generation and tool consumer o
 Use actual provider usage for cached and fresh tokens. Local archives, stable-prefix hashes and configuration are supporting observations, not proof of a provider cache hit. A changed prefix can temporarily reduce cache reuse; compare subsequent equivalent requests before claiming improvement.
 
 These are portable helpers and host contracts. This repository does not include a private OpenCode installation, its credentials, production Source, process launcher or a replacement scheduler.
+
+## Current-task Source and soft context targets
+
+Pass the host's current `task` and `nativeTask` snapshots to `restoreCurrentEvidence`.
+Both identify the same active `taskID`, `goalID`, and `goalRevision`; `task.sourceHints`
+contains exact code file paths. The returned `taskSourcePriorityCallIDs` includes
+only already verified current Source observations for those paths. Preserve them
+when reducing optional history to a soft token target. A low target must not evict
+the very files the current task needs and then cause the model to read them again.
+
+This priority does not grant file access, CAS, a new claim, an API retry, or a cache
+hit. Keep the original receipts and ranges, check hard fresh/total admission after
+packing, and explicitly expose any omitted range when hard admission requires a
+smaller working set. A stopped or changed task never inherits this priority.

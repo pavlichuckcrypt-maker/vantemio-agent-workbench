@@ -2,6 +2,8 @@
 
 ## 0.6.2 - 2026-10-29
 
+- Preserve verified current-task Source priority at soft context targets; unrelated historical evidence remains optional and hard admission remains unchanged.
+
 - Keep exact, current, already observed task-document ranges available to request packers through `collectRequiredTaskDocuments`. Duplicate reads become one document block with explicit call aliases; changed Source, missing originals and owner Stop remain excluded. Required text is never silently replaced with another excerpt.
 - Reconcile authenticated terminal read failures and directory metadata through the existing original-outcome verifier. A failed read is not a successful execution or an unknown mutation; directory metadata has no invented Source digest.
 - Document where hosts must integrate these portable policies before serialization, admission and cache-prefix construction. Private host adapters, runtime history and deployment configuration are not distributed.
