@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased — product naming and operations
+## 0.6.0 — 2026-10-28
+
+- Preserve authenticated active working Source across historical read-budget demotions, with changed-input/hash negatives.
+- Add portable original-receipt reconciliation with before/after task and Stop checks; preserve UNKNOWN and distinguish completed failures from success.
+- Add byte/count bounded proof caching, same-byte Source observation deduplication, explicit incomplete read previews and matching maintenance-hold qualification.
+- Add host-exclusive continuation CAS/receipt helpers that preserve newer owner state and native provider/model/reasoning choice.
+- Add regression negatives, offline installed consumers and RU/EN integration contracts. No host deployment settings, private adapters or product histories are included.
+
+## 0.5.3 — product naming and operations
 
 - Present the project as Vantemio Agent Workbench, a reliability toolkit for autonomous coding-agent development. Keep the technical package name and exports compatible.
 - Add RU/EN ownership, safe maintenance, exact-input reconciliation and normal-consumer acceptance guidance. Runtime code remains version 0.5.3.
