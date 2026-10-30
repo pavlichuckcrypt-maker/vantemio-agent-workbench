@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.8
+
+- Preserve explicit line coverage from original authenticated reads: a completed first page and a file hash do not establish whole-file review or absence outside the returned interval.
+- Classify numeric NR/FNR awk selection with its default stdout action as readonly; action programs, system calls and redirects remain unqualified.
+
 ## 0.6.7
 
 - Separate historical filesystem effects from request admission: scoped find predicates, stdout printing and default traversal remain readonly even without a depth option or filename extension. Command execution and filesystem-write actions stay rejected; a timeout supplies no usable result, retry permission or descendant-termination claim.

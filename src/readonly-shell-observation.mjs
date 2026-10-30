@@ -69,6 +69,9 @@ export function readonlyShellObservation(command,{scopeRoots=[],workdir,caseInse
    else if(['-n','-c'].includes(args[i])&&/^[1-9][0-9]{0,3}$/.test(args[i+1]||''))i+=2;
    const files=args.slice(i);if(files.some(x=>x.startsWith('-')||!scoped(x)))return false;
    if(!piped&&!files.length)return false;if(piped&&files.length)return false;if(files.length)reads++;
+  }else if(name==='awk'){
+   // Numeric NR/FNR selection has only awk's default stdout action.
+   if(piped||args.length!==2||args[0].length>1000||! /^(?:NR|FNR)\s*(?:>=|<=|==|!=|>|<)\s*\d{1,9}(?:\s*(?:&&|\|\|)\s*(?:NR|FNR)\s*(?:>=|<=|==|!=|>|<)\s*\d{1,9}){0,7}$/.test(args[0])||!scoped(args[1]))return false;reads++;
   }else if(name==='sha256sum'){
    if(piped||!args.length||args.length>8||args.some(x=>x.startsWith('-')||!scoped(x)))return false;reads++;
   }else if(name==='find'){

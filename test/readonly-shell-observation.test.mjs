@@ -15,3 +15,6 @@ test('directory guards and filename discovery reject effects or unbounded roots'
 
 test('historical find observation does not confuse read predicates with execution permission',()=>{for(const s of ['find /project/docs -name \"REPORT*\"; find /project/src -maxdepth 4 -name \"REPORT*\"','find /project/docs -maxdepth 3 -name \"map.md\" -print','find /project/src -iname \"*.py\" -type f -print0','find /project/docs -empty -ls'])assert.equal(observe(s),true,s);});
 test('find mutation and external-command actions remain unknown effects',()=>{for(const s of['find /project -name x -delete','find /project -execdir touch x +','find /project -fprint /project/output','find /project -fprintf /project/output %p'])assert.equal(observe(s),false,s);});
+
+test('numeric awk window is a read observation, with no action program',()=>assert.equal(observe(`awk 'NR>=1410 && NR<=1414' /project/module.py`),true));
+test('awk programs capable of effects are never inferred readonly',()=>{for(const s of[`awk 'BEGIN { system("touch /project/x") }' /project/a`,`awk '{print > "/project/x"}' /project/a`,`awk 'NR>=1; system("x")' /project/a`])assert.equal(observe(s),false,s);});

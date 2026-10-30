@@ -1,6 +1,6 @@
 {
   "name": "vantemio-agentic-backend",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "private": true,
   "type": "module",
   "description": "Reliability toolkit for autonomous development in OpenCode and other coding-agent hosts",
@@ -50,7 +50,8 @@
     "./service-description-budget": "./src/service-description-budget.mjs",
     "./verified-text-read-presentation": "./src/verified-text-read-presentation.mjs",
     "./readonly-shell-observation": "./src/readonly-shell-observation.mjs",
-    "./plan-observation": "./src/current-plan-observation.mjs"
+    "./plan-observation": "./src/current-plan-observation.mjs",
+    "./read-coverage": "./src/read-coverage.mjs"
   },
   "files": [
     "src",
