@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.10
+
+- Support an explicitly selected names-only lazy skill catalogue with complete hash-bound original help and exact restoration. Native validation, owner instructions, Goal and Source stay intact.
+
 ## 0.6.9
 
 - Add a bound readonly reconciliation admission policy: unknown effects retain observation access only behind a host execution fence and exact-original observer; default request guards remain strict.

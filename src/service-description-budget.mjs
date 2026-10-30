@@ -2,13 +2,14 @@ import {createHash} from 'node:crypto';
 const sha=x=>createHash('sha256').update(x).digest('hex');
 const digest=x=>sha(JSON.stringify(x));
 const validName=x=>typeof x==='string'&&/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(x);
-function brief(text){
-  if(text.length<=80)return text;
+function brief(text,limit){
+  if(limit===0)return '';
+  if(text.length<=limit)return text;
   const first=text.split(/(?<=[.!?])\s+/)[0];
-  if(first.length<=80)return first;
-  return first.slice(0,80).replace(/\s+\S*$/,'');
+  if(first.length<=limit)return first;
+  return first.slice(0,limit).replace(/\s+\S*$/,'');
 }
-function catalogText(text){
+function catalogText(text,limit){
   if(typeof text!=='string'||!/^You are OpenCode\b/.test(text))return{value:text,names:[],changed:false,originals:[]};
   const names=[];let changed=false;const originals=[];
   const value=text.replace(/<available_skills>([\s\S]*?)<\/available_skills>/g,(all,inner)=>{
@@ -26,7 +27,7 @@ function catalogText(text){
       render=rows=>'<available_skills>'+rows.map(e=>'<skill><name>'+e.name+'</name><description>'+e.description+'</description></skill>').join('')+'</available_skills>';
     }
     if(new Set(entries.map(e=>e.name)).size!==entries.length)return all;
-    names.push(...entries.map(e=>e.name));const shorter=entries.map(e=>({...e,description:brief(e.description)}));
+    names.push(...entries.map(e=>e.name));const shorter=entries.map(e=>({...e,description:brief(e.description,limit)}));
     if(shorter.every((e,i)=>e.description===entries[i].description))return all;
     const projected=render(shorter);if(Buffer.byteLength(projected)>=Buffer.byteLength(all))return all;
     originals.push({original:all,projected,originalSHA256:sha(all),projectedSHA256:sha(projected)});changed=true;return projected;
@@ -43,7 +44,8 @@ function schemaWithoutHelp(schema){
 // Only exact, caller-qualified service metadata is shortened. Full descriptors
 // remain in a hash-bound on-demand archive; installed skills and native schemas
 // are unchanged. This is not a Source/task/instruction summarizer.
-export function compactServiceDescriptions(body,{knownDescriptions=[],compactQualifiedSchemas=false}={}){
+export function compactServiceDescriptions(body,{knownDescriptions=[],compactQualifiedSchemas=false,skillSummaryMaxChars=80}={}){
+  if(!Number.isInteger(skillSummaryMaxChars)||skillSummaryMaxChars<0||skillSummaryMaxChars>120)throw Error('SERVICE_CATALOG_SUMMARY_BOUND');
   const copy=structuredClone(body),archive={schema:'agent-service-descriptions/v1',originalBodySHA256:digest(body),tools:[],catalogs:[]},names=[];
   const known=new Map(knownDescriptions.map(x=>[x.name,x]));
   for(let i=0;i<(copy.tools||[]).length;i++){
@@ -55,13 +57,13 @@ export function compactServiceDescriptions(body,{knownDescriptions=[],compactQua
     archive.tools.push(item);f.description=k.summary;
   }
   for(const field of ['instructions','system'])if(typeof copy[field]==='string'){
-    const r=catalogText(copy[field]);names.push(...r.names);if(r.changed){copy[field]=r.value;archive.catalogs.push(...r.originals.map(x=>({...x,path:[field]})));}
+    const r=catalogText(copy[field],skillSummaryMaxChars);names.push(...r.names);if(r.changed){copy[field]=r.value;archive.catalogs.push(...r.originals.map(x=>({...x,path:[field]})));}
   }
   for(const field of ['messages','input'])for(let i=0;i<(copy[field]||[]).length;i++){
     const m=copy[field][i];if(!['system','developer'].includes(m.role))continue;
     const parts=typeof m.content==='string'?[{text:m.content}]:m.content;if(!Array.isArray(parts))continue;
     for(let j=0;j<parts.length;j++){
-      if(typeof parts[j]?.text!=='string')continue;const r=catalogText(parts[j].text);names.push(...r.names);
+      if(typeof parts[j]?.text!=='string')continue;const r=catalogText(parts[j].text,skillSummaryMaxChars);names.push(...r.names);
       if(!r.changed)continue;parts[j].text=r.value;
       archive.catalogs.push(...r.originals.map(x=>({...x,path:[field,i,'content',...(typeof m.content==='string'?[]:[j,'text'])]})));
     }if(typeof m.content==='string')m.content=parts[0].text;
