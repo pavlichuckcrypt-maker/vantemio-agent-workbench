@@ -95,3 +95,7 @@ Native recovery details and RU/EN guidance: [docs/NATIVE_RECOVERY.md](docs/NATIV
 ## Service metadata and documentary reads
 
 Version 0.6.4 adds `service-description-budget`, `verified-text-read-presentation` and `readonly-shell-observation`. Normalize the SDK catalog before measuring service overhead; keep full native help and official skill instructions available on demand. Code and documentary reads use the same authenticated readonly-result policy, with explicit missing ranges rather than silently omitted Source. [Integration and limits](docs/READ_CONTEXT_BUDGET.md) · [Русский](docs/READ_CONTEXT_BUDGET.ru.md).
+
+## Observe unresolved originals
+
+Version 0.6.9 adds an explicit policy for read-only original reconciliation behind a verified host execution fence. Unknown effects, Stop and no-replay rules remain intact; native SDK selection is unchanged. [Host contract](docs/READONLY_RECONCILIATION.md) · [Русский](docs/READONLY_RECONCILIATION.ru.md).

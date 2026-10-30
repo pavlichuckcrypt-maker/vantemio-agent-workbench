@@ -3,10 +3,10 @@ const sha=x=>createHash('sha256').update(x).digest('hex');
 const digest=x=>sha(JSON.stringify(x));
 const validName=x=>typeof x==='string'&&/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(x);
 function brief(text){
-  if(text.length<=120)return text;
+  if(text.length<=80)return text;
   const first=text.split(/(?<=[.!?])\s+/)[0];
-  if(first.length<=120)return first;
-  return first.slice(0,120).replace(/\s+\S*$/,'');
+  if(first.length<=80)return first;
+  return first.slice(0,80).replace(/\s+\S*$/,'');
 }
 function catalogText(text){
   if(typeof text!=='string'||!/^You are OpenCode\b/.test(text))return{value:text,names:[],changed:false,originals:[]};
@@ -48,9 +48,10 @@ export function compactServiceDescriptions(body,{knownDescriptions=[],compactQua
   const known=new Map(knownDescriptions.map(x=>[x.name,x]));
   for(let i=0;i<(copy.tools||[]).length;i++){
     const f=copy.tools[i].function||copy.tools[i],k=known.get(f.name);
-    if(!k||typeof f.description!=='string'||sha(f.description)!==k.sha256||typeof k.summary!=='string'||!k.summary.trim()||k.summary.length>=f.description.length)continue;
+    if(!k||typeof f.description!=='string'||sha(f.description)!==k.sha256||typeof k.summary!=='string'||!k.summary.trim()||k.summary.length>f.description.length)continue;
     const item={index:i,original:f.description,projected:k.summary,originalSHA256:sha(f.description),projectedSHA256:sha(k.summary)};
     if(compactQualifiedSchemas&&typeof k.parametersSHA256==='string'&&f.parameters&&typeof f.parameters==='object'&&k.parametersSHA256===digest(f.parameters)){const parameters=schemaWithoutHelp(f.parameters);if(digest(parameters)!==digest(f.parameters)){item.originalParameters=f.parameters;item.originalParametersSHA256=digest(f.parameters);item.projectedParametersSHA256=digest(parameters);f.parameters=parameters;}}
+    if(item.original===item.projected&&!item.originalParameters)continue;
     archive.tools.push(item);f.description=k.summary;
   }
   for(const field of ['instructions','system'])if(typeof copy[field]==='string'){

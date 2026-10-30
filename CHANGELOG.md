@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.9
+
+- Add a bound readonly reconciliation admission policy: unknown effects retain observation access only behind a host execution fence and exact-original observer; default request guards remain strict.
+- Allow fingerprint-qualified schema help to become on-demand metadata even when the tool description is already concise. Preserve validation keywords, complete originals and exact restoration.
+- Shorten native skill catalog summaries while preserving every skill name and full upstream instructions in the archive.
+
 ## 0.6.8
 
 - Preserve explicit line coverage from original authenticated reads: a completed first page and a file hash do not establish whole-file review or absence outside the returned interval.

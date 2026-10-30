@@ -42,6 +42,10 @@ import {presentVerifiedTextRead} from 'vantemio-agentic-backend/verified-text-re
 import {readonlyShellObservation} from 'vantemio-agentic-backend/readonly-shell-observation';
 import {currentPlanObservation} from 'vantemio-agentic-backend/plan-observation';
 import {deriveReadCoverage} from 'vantemio-agentic-backend/read-coverage';
+import {isReconciliationObservationTool,projectReadonlyReconciliation} from 'vantemio-agentic-backend/readonly-reconciliation';
+assert.equal(isReconciliationObservationTool('studio_station_recover'),true);
+assert.equal(isReconciliationObservationTool('write'),false);
+const ordinaryTask={unknownTools:false};assert.equal(projectReadonlyReconciliation(ordinaryTask,{}).task,ordinaryTask);
 assert.equal(deriveReadCoverage({output:'<path>/project/a</path>\\n<type>file</type>\\n<content>\\n1: a\\n</content>\\n',totalLines:10,sourceSHA256:'a'.repeat(64)}).coversWholeFile,false);
 assert.equal(currentPlanObservation(Buffer.from('current: compare caller'),'PLAN.md').currentLocalText,'current: compare caller');
 assert.equal(currentPlanObservation('x'.repeat(7000),'PLAN.md').incomplete,true);
