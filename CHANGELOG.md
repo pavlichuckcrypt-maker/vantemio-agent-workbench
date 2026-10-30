@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.7
+
+- Separate historical filesystem effects from request admission: scoped find predicates, stdout printing and default traversal remain readonly even without a depth option or filename extension. Command execution and filesystem-write actions stay rejected; a timeout supplies no usable result, retry permission or descendant-termination claim.
+
 ## 0.6.6
 
 - Preserve bounded current declared plan text with the hash of the complete original and an explicit incomplete flag. Metadata alone is insufficient when the current task needs the plan. The pure presenter reads no files, grants no owner/Source authority, and creates no continuation or controller.

@@ -72,15 +72,18 @@ export function readonlyShellObservation(command,{scopeRoots=[],workdir,caseInse
   }else if(name==='sha256sum'){
    if(piped||!args.length||args.length>8||args.some(x=>x.startsWith('-')||!scoped(x)))return false;reads++;
   }else if(name==='find'){
-   if(piped||!scoped(args[0])||args[1]!=='-maxdepth'||! /^[1-6]$/.test(args[2]||''))return false;
-   const depth=args[2];let i=3,count=0;
-   while(i<args.length){
-    if(count){if(args[i++]!=='-o')return false;if(args[i]==='-maxdepth'){if(args[i+1]!==depth)return false;i+=2;}}
-    if(args[i]==='-type'){if(args[i+1]!=='f')return false;i+=2;}
-    if(args[i++]!=='-name'||! /^[A-Za-z0-9_*.?-]+\.(?:py|mjs|cjs|js|ts|md|json|sol|sql)$/.test(args[i++]||''))return false;
-    if(++count>8)return false;
+   if(piped||!scoped(args[0]))return false;
+   // Historical effect classification, not admission or a scan cost limit.
+   // Pure predicates/default stdout do not become writes without maxdepth.
+   for(let i=1;i<args.length;i++){
+    const option=args[i];
+    if(['-o','-or','-a','-and','-not','!','-print','-print0','-prune','-empty','-readable','-writable','-executable','-true','-false','-ls'].includes(option))continue;
+    if(['-maxdepth','-mindepth'].includes(option)){if(!/^\d{1,9}$/.test(args[++i]||''))return false;continue;}
+    if(option==='-type'){if(!/^[fdlpsbc]$/.test(args[++i]||''))return false;continue;}
+    if(['-name','-iname','-path','-ipath','-regex','-iregex','-printf'].includes(option)){if(typeof args[++i]!=='string'||!args[i]||args[i].length>2000)return false;continue;}
+    return false;
    }
-   if(!count)return false;reads++;
+   reads++;
   }else if(name==='wc'||name==='ls'){
    if(piped&&name==='ls')return false;let i=0;const flag=name==='wc'?/^-[lcw]+$/:/^-[al1dFhLrSt]+$/;
    while(flag.test(args[i]||''))i++;const files=args.slice(i);if(files.some(x=>x.startsWith('-')||!scoped(x,true)))return false;
