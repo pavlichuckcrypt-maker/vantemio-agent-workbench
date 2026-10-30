@@ -9,13 +9,14 @@ function brief(text,limit){
   if(first.length<=limit)return first;
   return first.slice(0,limit).replace(/\s+\S*$/,'');
 }
-function catalogText(text,limit){
+function catalogText(text,limit,namesOnly){
   if(typeof text!=='string'||!/^You are OpenCode\b/.test(text))return{value:text,names:[],changed:false,originals:[]};
   const names=[];let changed=false;const originals=[];
   const value=text.replace(/<available_skills>([\s\S]*?)<\/available_skills>/g,(all,inner)=>{
     let entries,render;
     if(inner.trim().startsWith('[')){
       try{entries=JSON.parse(inner);}catch{return all;}
+      if(Array.isArray(entries)&&entries.length&&entries.every(validName)){if(new Set(entries).size!==entries.length)return all;names.push(...entries);return all;}
       if(!Array.isArray(entries)||!entries.length||entries.some(e=>!e||!validName(e.name)||typeof e.description!=='string'||Object.keys(e).some(k=>!['name','description','location'].includes(k))))return all;
       render=rows=>'<available_skills>'+JSON.stringify(rows)+'</available_skills>';
     }else{
@@ -28,8 +29,8 @@ function catalogText(text,limit){
     }
     if(new Set(entries.map(e=>e.name)).size!==entries.length)return all;
     names.push(...entries.map(e=>e.name));const shorter=entries.map(e=>({...e,description:brief(e.description,limit)}));
-    if(shorter.every((e,i)=>e.description===entries[i].description))return all;
-    const projected=render(shorter);if(Buffer.byteLength(projected)>=Buffer.byteLength(all))return all;
+    if(!namesOnly&&shorter.every((e,i)=>e.description===entries[i].description))return all;
+    const projected=namesOnly?'<available_skills>'+JSON.stringify(entries.map(e=>e.name))+'</available_skills>':render(shorter);if(Buffer.byteLength(projected)>=Buffer.byteLength(all))return all;
     originals.push({original:all,projected,originalSHA256:sha(all),projectedSHA256:sha(projected)});changed=true;return projected;
   });return{value,names,changed,originals};
 }
@@ -44,7 +45,8 @@ function schemaWithoutHelp(schema){
 // Only exact, caller-qualified service metadata is shortened. Full descriptors
 // remain in a hash-bound on-demand archive; installed skills and native schemas
 // are unchanged. This is not a Source/task/instruction summarizer.
-export function compactServiceDescriptions(body,{knownDescriptions=[],compactQualifiedSchemas=false,skillSummaryMaxChars=80}={}){
+export function compactServiceDescriptions(body,{knownDescriptions=[],compactQualifiedSchemas=false,skillSummaryMaxChars=80,skillNamesOnly=false}={}){
+  if(typeof skillNamesOnly!=='boolean')throw Error('SERVICE_NAMES_MODE');
   if(!Number.isInteger(skillSummaryMaxChars)||skillSummaryMaxChars<0||skillSummaryMaxChars>120)throw Error('SERVICE_CATALOG_SUMMARY_BOUND');
   const copy=structuredClone(body),archive={schema:'agent-service-descriptions/v1',originalBodySHA256:digest(body),tools:[],catalogs:[]},names=[];
   const known=new Map(knownDescriptions.map(x=>[x.name,x]));
@@ -57,13 +59,13 @@ export function compactServiceDescriptions(body,{knownDescriptions=[],compactQua
     archive.tools.push(item);f.description=k.summary;
   }
   for(const field of ['instructions','system'])if(typeof copy[field]==='string'){
-    const r=catalogText(copy[field],skillSummaryMaxChars);names.push(...r.names);if(r.changed){copy[field]=r.value;archive.catalogs.push(...r.originals.map(x=>({...x,path:[field]})));}
+    const r=catalogText(copy[field],skillSummaryMaxChars,skillNamesOnly);names.push(...r.names);if(r.changed){copy[field]=r.value;archive.catalogs.push(...r.originals.map(x=>({...x,path:[field]})));}
   }
   for(const field of ['messages','input'])for(let i=0;i<(copy[field]||[]).length;i++){
     const m=copy[field][i];if(!['system','developer'].includes(m.role))continue;
     const parts=typeof m.content==='string'?[{text:m.content}]:m.content;if(!Array.isArray(parts))continue;
     for(let j=0;j<parts.length;j++){
-      if(typeof parts[j]?.text!=='string')continue;const r=catalogText(parts[j].text,skillSummaryMaxChars);names.push(...r.names);
+      if(typeof parts[j]?.text!=='string')continue;const r=catalogText(parts[j].text,skillSummaryMaxChars,skillNamesOnly);names.push(...r.names);
       if(!r.changed)continue;parts[j].text=r.value;
       archive.catalogs.push(...r.originals.map(x=>({...x,path:[field,i,'content',...(typeof m.content==='string'?[]:[j,'text'])]})));
     }if(typeof m.content==='string')m.content=parts[0].text;

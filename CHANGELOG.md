@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.11 - 2026-10-30
+
+- Add opt-in `skillNamesOnly` to the qualified native service catalog presentation. Names stay discoverable without repeated empty XML description wrappers.
+- Preserve complete original descriptions/locations in the exact-restoration archive; keep Source, owner instructions, tool validation, permissions and native model selection unchanged.
+- Keep already projected catalogs idempotent while reporting their advertised names. This is a portable presentation primitive, not a private host adapter or a cache-hit guarantee.
+
 ## 0.6.10
 
 - Support an explicitly selected names-only lazy skill catalogue with complete hash-bound original help and exact restoration. Native validation, owner instructions, Goal and Source stay intact.

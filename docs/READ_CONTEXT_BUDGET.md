@@ -50,3 +50,8 @@ Historical effect classification is separate from scan admission. Scoped `find` 
 `deriveReadCoverage` presents original totalLines, numbered intervals, EOF observation and missing ranges. The host must authenticate the result and bind it to the original call/Goal/receipt. Output truncation flags describe a different boundary; a 200-line page of a 1609-line file is incomplete even when display truncation is false. A whole-file digest does not prove that later sections were inspected.
 
 A host may explicitly select `skillSummaryMaxChars: 0` to advertise every skill name while keeping routing descriptions in the exact archive. Load the selected official skill before applying it. This option changes catalogue metadata only; owner instructions, Goal, Source and native tool validation remain intact. The default remains 80 characters.
+
+
+### 0.6.11: opt-in native skill names
+
+`compactServiceDescriptions(body, { skillNamesOnly: true })` renders a recognized native catalog as a list of names and retains the complete original catalog in its hash-bound restoration archive. The default remains unchanged. The host must retain that archive and provide full official instructions through its native skill loader. This presentation does not grant execution, Source/CAS or release authority and does not prove caching. Already projected names remain discoverable without repeated transformations.

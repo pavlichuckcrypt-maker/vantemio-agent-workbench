@@ -99,3 +99,5 @@ Version 0.6.4 adds `service-description-budget`, `verified-text-read-presentatio
 ## Observe unresolved originals
 
 Version 0.6.9 adds an explicit policy for read-only original reconciliation behind a verified host execution fence. Unknown effects, Stop and no-replay rules remain intact; native SDK selection is unchanged. [Host contract](docs/READONLY_RECONCILIATION.md) · [Русский](docs/READONLY_RECONCILIATION.ru.md).
+
+Version 0.6.11 adds an opt-in names-only skill catalog view: `compactServiceDescriptions(body, { skillNamesOnly: true })`. Keep its original metadata archive for exact restoration, and load full official skills through the host's native skill tool when needed. Unknown/custom catalogs stay unchanged. This does not install skills, change permissions, remove Source or guarantee a provider cache hit.
