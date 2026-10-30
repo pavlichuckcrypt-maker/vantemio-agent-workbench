@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.6
+
+- Preserve bounded current declared plan text with the hash of the complete original and an explicit incomplete flag. Metadata alone is insufficient when the current task needs the plan. The pure presenter reads no files, grants no owner/Source authority, and creates no continuation or controller.
+
 ## 0.6.5
 
 - Classify historical readonly observations containing a literal directory-failure exit, bounded filename predicates and file checksums. Arbitrary shell fallback, find execution/deletion and checksum instruction files remain rejected. This pure helper executes nothing and grants no retry, fresh Source or release authority.
