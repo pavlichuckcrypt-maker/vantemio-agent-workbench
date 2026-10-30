@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.5
+
+- Classify historical readonly observations containing a literal directory-failure exit, bounded filename predicates and file checksums. Arbitrary shell fallback, find execution/deletion and checksum instruction files remain rejected. This pure helper executes nothing and grants no retry, fresh Source or release authority.
+
 ## 0.6.4 — 2026-10-30
 
 - Classify already authenticated historical compound readonly shell inspections with explicit roots, including Unicode directories, `cd && sed/grep` chains and bounded read filters. This is effect observation only, never execution permission or a claim that timed-out descendants ended.

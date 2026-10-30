@@ -40,3 +40,5 @@ These are pure helpers, not a hosted agent or deployment adapter. Authentication
 ## Historical readonly shell observations
 
 `readonlyShellObservation(command, {scopeRoots, workdir})` recognizes a deliberately limited grammar of standard read commands, literal directory changes, and read pipelines. It requires explicit roots and never runs the command. Use it only after authenticating the original worker/result and exact arguments. Host-qualified executables, environment and signed operation identity remain prerequisites; path scope is lexical. A true result is not scan permission, successful Source output, proof that timeout descendants ended, or an authorization to replay. Arbitrary interpreters, mutators, writable redirects, dynamic expansions and unsupported grammar remain unqualified.
+
+Historical readonly shell observations also support a literal `cd … || exit 1` guard, bounded `find -maxdepth` filename predicates and `sha256sum` file operands. This only qualifies an authenticated original outcome; it does not run, retry or approve the command. Arbitrary fallback commands, find actions and checksum instruction files fail closed.

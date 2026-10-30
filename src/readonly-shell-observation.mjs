@@ -32,17 +32,25 @@ export function readonlyShellObservation(command,{scopeRoots=[],workdir,caseInse
   const redirect=command.slice(i).match(/^(?:2>&1|2>\s*\/dev\/null)(?=\s|[;|&]|$)/);
   if(redirect){if(active)return false;i+=redirect[0].length-1;continue;}
   if(c==='&'){if(command[i+1]!=='&'||!finish('&&'))return false;i++;continue;}
+  if(c==='|'&&command[i+1]==='|'){if(!finish('||'))return false;i++;continue;}
   if(c===';'||c==='|'){if(command[i+1]===c||!finish(c))return false;continue;}
   if(/[<>$`(){}]/.test(c))return false;word+=c;active=true;
   if(argv.length>256)return false;
  }
  if(quote)return false;flush();if(argv.length)stages.push({argv,op:null});else if(stages.at(-1)?.op!==';')return false;
  let piped=false,reads=0;
- for(const stage of stages){
+ for(let si=0;si<stages.length;si++){
+  const stage=stages[si];
   const[name,...args]=stage.argv;
+  if(stage.op==='||'){
+   const next=stages[si+1];
+   if(name!=='cd'||!next||next.argv.length!==2||next.argv[0]!=='exit'||next.argv[1]!=='1'||![';',null].includes(next.op))return false;
+  }
   if(name==='cd'){
    if(piped||stage.op==='|'||args.length!==1||args[0]==='-'||!scoped(args[0]))return false;
    base=absolute(norm(args[0]))?norm(args[0]):path.posix.join(base,norm(args[0]));
+  }else if(name==='exit'){
+   if(si===0||stages[si-1].argv[0]!=='cd'||stages[si-1].op!=='||'||args.length!==1||args[0]!=='1'||![';',null].includes(stage.op))return false;
   }else if(name==='echo'){
    if(piped||args.join(' ').length>1000)return false;
   }else if(name==='sed'){
@@ -61,6 +69,18 @@ export function readonlyShellObservation(command,{scopeRoots=[],workdir,caseInse
    else if(['-n','-c'].includes(args[i])&&/^[1-9][0-9]{0,3}$/.test(args[i+1]||''))i+=2;
    const files=args.slice(i);if(files.some(x=>x.startsWith('-')||!scoped(x)))return false;
    if(!piped&&!files.length)return false;if(piped&&files.length)return false;if(files.length)reads++;
+  }else if(name==='sha256sum'){
+   if(piped||!args.length||args.length>8||args.some(x=>x.startsWith('-')||!scoped(x)))return false;reads++;
+  }else if(name==='find'){
+   if(piped||!scoped(args[0])||args[1]!=='-maxdepth'||! /^[1-6]$/.test(args[2]||''))return false;
+   const depth=args[2];let i=3,count=0;
+   while(i<args.length){
+    if(count){if(args[i++]!=='-o')return false;if(args[i]==='-maxdepth'){if(args[i+1]!==depth)return false;i+=2;}}
+    if(args[i]==='-type'){if(args[i+1]!=='f')return false;i+=2;}
+    if(args[i++]!=='-name'||! /^[A-Za-z0-9_*.?-]+\.(?:py|mjs|cjs|js|ts|md|json|sol|sql)$/.test(args[i++]||''))return false;
+    if(++count>8)return false;
+   }
+   if(!count)return false;reads++;
   }else if(name==='wc'||name==='ls'){
    if(piped&&name==='ls')return false;let i=0;const flag=name==='wc'?/^-[lcw]+$/:/^-[al1dFhLrSt]+$/;
    while(flag.test(args[i]||''))i++;const files=args.slice(i);if(files.some(x=>x.startsWith('-')||!scoped(x,true)))return false;
