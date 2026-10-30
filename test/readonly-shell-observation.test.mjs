@@ -1,0 +1,11 @@
+import test from'node:test';import assert from'node:assert/strict';
+const m=await import('../src/readonly-shell-observation.mjs').catch(()=>({}));
+const observe=(s,o={})=>{assert.equal(typeof m.readonlyShellObservation,'function','missing historical readonly grammar');return m.readonlyShellObservation(s,{scopeRoots:['/project'],...o});};
+const command='cd /project/модуль && sed -n \'1,60p\' module.py && echo "=== CALLERS ===" && grep -rn "first_symbol\\|second_symbol" --include=*.py /project/src /project/release 2>/dev/null | grep -v "^/project/модуль/module.py" | head -40';
+test('classifies an already observed compound Unicode Source inspection without running it',()=>assert.equal(observe(command),true));
+test('scoped current directory makes a relative readonly operand meaningful',()=>assert.equal(observe("sed -n '4,90p' module.py",{workdir:'/project/src'}),true));
+test('a quoted mutation-looking grep pattern remains data',()=>assert.equal(observe("grep -n 'rm -rf; literal' /project/source.py"),true));
+test('no implicit filesystem scope',()=>{assert.equal(m.readonlyShellObservation(command),false);assert.equal(observe('grep -n x /elsewhere/file.py'),false);assert.equal(observe('sed -n 1,60p relative.py'),false);});
+test('side effects and arbitrary interpreters are never called readonly',()=>{for(const s of[command+'; rm /project/file','sed -i 1,60p /project/file','python /project/script.py','node /project/script.mjs','bash -c "grep x /project/file"','grep -n "$(touch /project/file)" /project/src','grep x /project/file > /project/output','grep x /project/file &','cd /project && echo x >> /project/file'])assert.equal(observe(s),false,s);});
+test('unsafe options and writable sed programs are rejected',()=>{for(const s of['sed -n "1,4w /project/new" /project/file','sed -n 1,60p -i','sed -n 1,60p *.py','grep -f /project/patterns /project/file','tail -f /project/log','grep x /project/../secret'])assert.equal(observe(s),false,s);});
+test('malformed quoting, redirection and shell groups fail closed',()=>{for(const s of['grep "x /project/file','grep x /project/file 2>/dev/null-extra','(grep x /project/file)','grep x /project/file || echo x','&& grep x /project/file'])assert.equal(observe(s),false,s);});

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.4 — 2026-10-30
+
+- Classify already authenticated historical compound readonly shell inspections with explicit roots, including Unicode directories, `cd && sed/grep` chains and bounded read filters. This is effect observation only, never execution permission or a claim that timed-out descendants ended.
+
+- Defer exact-fingerprint SDK help and skill-catalog summaries to an integrity-bound archive while preserving full originals, installed skills, tool validation, manual model selection and owner task/Source.
+- Keep SDK catalog normalization before service-description budgeting; support messages, responses and messages-style tool metadata without guessing schemas.
+- Present any verified numbered textual read through the same bounded codec, including documentation and one-line data. Original ranges, SHA and explicit incomplete-review status remain available; host-required instructions and uncertain effects are never made optional by this helper.
+- Document host admission order and stable metadata references. These helpers do not send requests, replay tools, guarantee cache hits or replace private host adapters.
+
 ## 0.6.3 — 2026-10-29
 
 - Distinguish authenticated native edit no-match rejection from an uncertain write; preserve original failures, native opaque call IDs, owner Stop and no-replay.

@@ -91,3 +91,7 @@ Submit changes on a branch, include behavioral regression tests and update `CHAN
 Report suspected vulnerabilities privately through GitHub's private reporting facility when enabled; otherwise contact the repository owner privately. Do not include credentials or private request bodies in issues. This project's code is MIT licensed. Upstream skills retain their own licenses and are linked, not vendored.
 
 Native recovery details and RU/EN guidance: [docs/NATIVE_RECOVERY.md](docs/NATIVE_RECOVERY.md).
+
+## Service metadata and documentary reads
+
+Version 0.6.4 adds `service-description-budget`, `verified-text-read-presentation` and `readonly-shell-observation`. Normalize the SDK catalog before measuring service overhead; keep full native help and official skill instructions available on demand. Code and documentary reads use the same authenticated readonly-result policy, with explicit missing ranges rather than silently omitted Source. [Integration and limits](docs/READ_CONTEXT_BUDGET.md) · [Русский](docs/READ_CONTEXT_BUDGET.ru.md).

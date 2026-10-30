@@ -37,6 +37,18 @@ import {assertGenerationBinding} from 'vantemio-agentic-backend/generation-bindi
 import {presentSkillCatalogOnDemand} from 'vantemio-agentic-backend/skill-catalog-presentation';
 import {presentStructuredRead,decodeStructuredRead} from 'vantemio-agentic-backend/structured-read-presentation';
 import {normalizeGraphToolInput,planClientRead} from 'vantemio-agentic-backend/tool-read-boundary';
+import {compactServiceDescriptions,restoreServiceDescriptions} from 'vantemio-agentic-backend/service-description-budget';
+import {presentVerifiedTextRead} from 'vantemio-agentic-backend/verified-text-read-presentation';
+import {readonlyShellObservation} from 'vantemio-agentic-backend/readonly-shell-observation';
+assert.equal(readonlyShellObservation("cd /project/src && sed -n '1,20p' module.py",{scopeRoots:['/project']}),true);
+assert.equal(readonlyShellObservation('sed -i 1,20p /project/module.py',{scopeRoots:['/project']}),false);
+const budgetedService=compactServiceDescriptions({messages:[{role:'user',content:'Owner task remains'}]});
+assert.deepEqual(restoreServiceDescriptions(budgetedService.body,budgetedService.archive),{messages:[{role:'user',content:'Owner task remains'}]});
+assert.equal(presentVerifiedTextRead('unframed',{file:'/history/read',sha256:'a'.repeat(64),callID:'read'},0),null);
+const installedCatalog=presentSkillCatalogOnDemand({instructions:'You are OpenCode. <available_skills>'+JSON.stringify([{name:'audit',description:'Review code safely. '.repeat(40),location:'/official/audit/SKILL.md'}])+'</available_skills>'});
+const installedService=compactServiceDescriptions(installedCatalog.body);assert.equal(installedService.record.skillNames[0],'audit');assert.deepEqual(restoreServiceDescriptions(installedService.body,installedService.archive),installedCatalog.body);
+const installedRead=['<path>/project/doc.md</path>','<type>file</type>','<content>','1: original data','</content>'].join(String.fromCharCode(10));
+assert.match(presentVerifiedTextRead(installedRead,{file:'/history/exact-read',sha256:createHash('sha256').update(installedRead).digest('hex'),callID:'original-read'},0),/incompleteSourcePreview/);
 await assert.rejects(assertGenerationBinding('https://api.invalid/v1/chat/completions',{method:'POST',body:JSON.stringify({model:'chosen',messages:[]})}),/BINDING_REQUIRED/);
 assert.equal(normalizeGraphToolInput({arguments:{tool:'trace_path',arguments:{project:'indexed',qualified_name:'pkg.handler'}}}).input.arguments.function_name,'pkg.handler');
 assert.equal(planClientRead('grep -n "value" "C:/Project/module.py"',{stationRoot:'C:/Project'}).originalCommandUnchanged,true);
