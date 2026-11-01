@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.18 — remove duplicate current PLAN data
+
+- Add a pure projection that replaces a derivative PLAN/CURRENT_WORK excerpt with a reference only when the same excerpt is already present in a current native read result for that exact file.
+- Keep the native read result, Goal, tool schema and original observation file/hash metadata unchanged. Missing, different, malformed or nonmatching results remain untouched.
+- The host must account for local Source-index references before final request cleanup. A cache marker or local prefix match remains separate from provider cache usage.
+
 ## 0.6.17 — necessary Source context transfer
 
 - Keep complete hash-bound historical reads in the host's existing local memory with original call IDs and line mappings. A filename mentioned by a broad TODO no longer forces the whole file into every request; explicit Goal-required ranges stay protected.
