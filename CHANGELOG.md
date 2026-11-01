@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.17 — necessary Source context transfer
+
+- Keep complete hash-bound historical reads in the host's existing local memory with original call IDs and line mappings. A filename mentioned by a broad TODO no longer forces the whole file into every request; explicit Goal-required ranges stay protected.
+- Provide an idempotent current Source cache index at the volatile tail. Snapshot references do not grant fresh CAS, code review or execution authority.
+- Reuse an existing native ephemeral cache breakpoint on the stable Goal instead of volatile derived observations. This does not invent provider cache support or imply a cache hit.
+- Request ceilings and provider token calibration remain unchanged. Host integration must qualify the working view, verify archived bytes and test the fully composed request with actual calibration.
+
 ## 0.6.16 - 2026-11-01
 
 - Keep hash-bound canonical reads named by unfinished native TODOs even when the bounded display summary omits them. Exact paths and unambiguous bare filenames determine necessary Source; completed TODOs and ambiguous names do not.
