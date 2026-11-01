@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.14 - 2026-11-01
+
+- Ground continuation in current and next task metadata plus bounded unfinished TODO alternatives, so one blocked dependency does not hide independent authorized work.
+- Detect paraphrased automatic no-action answers against the actual input/task/model/release frame. Qualify a completed repair descendant through the preserved original control ledger; never treat it as permission to replay that control.
+- Keep streaming, genuine tool actions, new Source evidence and changed owner/model/task/release frames distinct from stagnation. The helpers grant no additional authority and perform no model or tool requests.
+
 ## 0.6.13 - 2026-11-01
 
 - Add pure request-bound token calibration with a retained one-day high-water sample; later small requests do not erase measured undercounting.
