@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.13 - 2026-11-01
+
+- Add pure request-bound token calibration with a retained one-day high-water sample; later small requests do not erase measured undercounting.
+- Use a reported total input count even when cached/uncached attribution is unknown; preserve unknown cache fields and keep provider/model/session/namespace evidence separate.
+- Retain only bounded derived observations; no provider requests, cache-hit guarantee, file access or action replay.
+
 ## 0.6.12 - 2026-11-01
 
 - Add a pure execution-manifest view for release producers: preserve Source identities and operational metadata, link full immutable provenance, and reject oversized registries before maintenance begins.
