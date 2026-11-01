@@ -33,6 +33,7 @@ import {prefixCommandOnce} from 'vantemio-agentic-backend/command-prefix';
 import {observeUsageStream} from 'vantemio-agentic-backend/usage-stream';
 import {qualifySourceView,qualifySourceViewFile} from 'vantemio-agentic-backend/source-view';
 import {knownNativeNoEffectFailure} from 'vantemio-agentic-backend/native-tool-outcome';
+import {executionManifestView} from 'vantemio-agentic-backend/release-manifest';
 import {assertGenerationBinding} from 'vantemio-agentic-backend/generation-binding-guard';
 import {presentSkillCatalogOnDemand} from 'vantemio-agentic-backend/skill-catalog-presentation';
 import {presentStructuredRead,decodeStructuredRead} from 'vantemio-agentic-backend/structured-read-presentation';
@@ -170,6 +171,7 @@ assert.equal(knownNativeNoEffectFailure({...rejectedPart,state:{...rejectedPart.
 const ambiguousPart={...rejectedPart,callID:'call_installed_ambiguous',state:{...rejectedPart.state,error:'Found multiple matches for oldString. Provide more surrounding context to make the match unique.',input:{...rejectedPart.state.input,newString:'changed'}}};
 assert.equal(knownNativeNoEffectFailure(ambiguousPart).code,'NATIVE_EDIT_AMBIGUOUS_PREWRITE');
 assert.equal(knownNativeNoEffectFailure({...ambiguousPart,state:{...ambiguousPart.state,input:{...ambiguousPart.state.input,replaceAll:true}}}),null);
+const manifestView=executionManifestView({files:[{source:'module.mjs',candidateSHA256:'a'.repeat(64),originalSource:'archive.mjs'}]},{file:'full.json',sha256:'b'.repeat(64)});assert.equal(manifestView.files[0].source,'module.mjs');assert.equal(manifestView.files[0].originalSource,undefined);
 console.log(JSON.stringify({installedExports:true,runtimeContinuity:true,taskRefresh:true,taskDocumentRanges:true,readTerminalFailure:true,sourceReuse:true,requestAdapter:true,usageUnknownPreserved:true,sourceView:true,streamObserver:true,prefixOnce:true,knownNativeNoEffect:true,providerRequests:0}));
 `);
   const result = run([path.join(consumer,'verify.mjs')],consumer);

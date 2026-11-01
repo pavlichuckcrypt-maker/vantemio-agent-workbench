@@ -1,6 +1,6 @@
 {
   "name": "vantemio-agentic-backend",
-  "version": "0.6.11",
+  "version": "0.6.12",
   "private": true,
   "type": "module",
   "description": "Reliability toolkit for autonomous development in OpenCode and other coding-agent hosts",
@@ -52,7 +52,8 @@
     "./readonly-shell-observation": "./src/readonly-shell-observation.mjs",
     "./plan-observation": "./src/current-plan-observation.mjs",
     "./read-coverage": "./src/read-coverage.mjs",
-    "./readonly-reconciliation": "./src/readonly-reconciliation.mjs"
+    "./readonly-reconciliation": "./src/readonly-reconciliation.mjs",
+    "./release-manifest": "./src/release-manifest.mjs"
   },
   "files": [
     "src",

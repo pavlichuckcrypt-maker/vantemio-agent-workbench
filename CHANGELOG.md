@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.12 - 2026-11-01
+
+- Add a pure execution-manifest view for release producers: preserve Source identities and operational metadata, link full immutable provenance, and reject oversized registries before maintenance begins.
+- Reject conflicting Source entries and invalid provenance without changing the input manifest.
+
 ## 0.6.11 - 2026-10-30
 
 - Add opt-in `skillNamesOnly` to the qualified native service catalog presentation. Names stay discoverable without repeated empty XML description wrappers.
