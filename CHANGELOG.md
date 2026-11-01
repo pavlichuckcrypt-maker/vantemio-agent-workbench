@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.16 - 2026-11-01
+
+- Keep hash-bound canonical reads named by unfinished native TODOs even when the bounded display summary omits them. Exact paths and unambiguous bare filenames determine necessary Source; completed TODOs and ambiguous names do not.
+- Separate necessary current Source from soft historical previews without changing hard input limits, native calls, selection, history, ownership or replay protections.
+- Support qualified same-Goal compaction anchors while preserving the current input/action checks.
+
 ## 0.6.15 - 2026-11-01
 
 - Recognize completed plain-text tool-call envelopes as unexecuted provider intent, including a reproduced malformed envelope. Earlier real tool actions in the same turn do not make that later intent executed.
