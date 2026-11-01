@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import * as m from '../src/runtime-progress.mjs';let count=0;
+const fake='{"text": "", "tool_calls": [{"name": "studio_codegraph", "arguments": {"tool": "search_graph", "arguments": {"project": "fixture-editor", "query": "ffmpeg"}}]}';
+const last=(text,extra={})=>({info:{id:'assistant1',parentID:'control1',role:'assistant',time:{created:1,completed:2},finish:'stop',...extra},parts:[{type:'text',text}]});
+const scope={goalID:'goal1',revision:1,taskID:'task1'},frame={externalInputID:'owner1',providerID:'provider1',modelID:'model1'};
+const run=(l,state={},messages=[l],automatic=true)=>m.terminalProgress(state,{last:l,messages,scope,automaticContinuation:automatic,continuationFrame:frame});
+const yes=(v)=>{assert.equal(v,true);count++},no=(v)=>{assert.equal(v,false);count++};
+// Regression: earlier successful tools do not turn unexecuted textual intent into a real call.
+const l=last(fake),previous={info:{id:'previous',parentID:'control1'},parts:[{type:'tool',tool:'studio_station_read',callID:'original1',state:{status:'completed',input:{filePath:'/project/editor.py'},output:'1: actual current source'}}]};
+yes(run(l,{},[previous,l]).unexecutedNativeToolIntent);yes(run(l,{},[previous,l]).noActionNeedsRepair);
+yes(run(last(JSON.stringify({text:'',tool_calls:[{name:'edit',arguments:{filePath:'PLAN.md',newString:'do not execute'}}]}))).unexecutedNativeToolIntent);
+yes(run(last(JSON.stringify({tool_calls:[{type:'function',function:{name:'read',arguments:'{}'}}]}))).unexecutedNativeToolIntent);
+for(const text of ['ordinary completed finding','Example: '+fake,'```json\n'+fake+'\n```',JSON.stringify({text:'This is a documented example',tool_calls:[{name:'read',arguments:{}}]}),JSON.stringify({text:'',tool_calls:[]}),JSON.stringify({text:'',tool_calls:[{example:'read'}]})])no(run(last(text)).unexecutedNativeToolIntent);
+no(run(last(fake,{error:{name:'APIError'}})).unexecutedNativeToolIntent);no(run(last(fake,{time:{created:1}})).unexecutedNativeToolIntent);no(run(last(fake,{finish:'length'})).unexecutedNativeToolIntent);
+const real=last(fake);real.parts.push({type:'tool',tool:'read',state:{status:'completed',input:{filePath:'source.py'},output:'source'}});no(run(real).unexecutedNativeToolIntent);
+no(run(l,{},[l],false).noActionNeedsRepair);
+const r=run(l,{},[previous,l]),state={dispatches:[{messageID:'control1',kind:'native_task_evidence_repair',progressEvidenceSHA256:r.noActionEvidenceSHA256,phase:'accepted'}]};yes(run(l,state,[previous,l]).stagnationQualified);no(run(l,state,[previous,l]).noActionNeedsRepair);
+for(const phase of ['UNKNOWN','intent'])yes(run(l,{dispatches:[{...state.dispatches[0],phase}]},[previous,l]).stagnationQualified);
+no(run(l,{dispatches:[{...state.dispatches[0],messageID:'unrelated'}]},[previous,l]).stagnationQualified);
+const cue=m.continuationTaskCue({toolFormatRepair:true,todos:[{status:'in_progress',content:'inspect actual Source'}],task:{taskID:'task1'}});yes(cue.includes('не был исполнен'));yes(cue.includes('native'));yes(cue.includes('не повторяй'));yes(cue.includes('inspect actual Source'));
+console.log(JSON.stringify({cases:count,passed:true,providerCalls:0,toolExecutions:0}));

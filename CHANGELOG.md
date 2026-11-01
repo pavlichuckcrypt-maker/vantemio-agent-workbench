@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.15 - 2026-11-01
+
+- Recognize completed plain-text tool-call envelopes as unexecuted provider intent, including a reproduced malformed envelope. Earlier real tool actions in the same turn do not make that later intent executed.
+- Return a bounded, ledger-qualified native-format correction cue. Never parse text into executable tool calls or replay completed/UNKNOWN operations; preserve genuine native calls, prose and examples.
+
 ## 0.6.14 - 2026-11-01
 
 - Ground continuation in current and next task metadata plus bounded unfinished TODO alternatives, so one blocked dependency does not hide independent authorized work.
