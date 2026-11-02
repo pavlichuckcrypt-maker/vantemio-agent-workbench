@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.21
+
+- Add a native grep default that excludes generated `.opencode-state` archives only when both path and include are omitted. Explicit archive searches and native path guards remain unchanged.
+- Exercise the real ripgrep JSON case: an oversized generated record is excluded while Markdown and Python source matches remain visible.
+- Document current-source paging under a fixed hard budget: an unreachable normal target must not reduce all selected code to metadata-only previews.
+
 ## 0.6.20 — separate fresh and qualified cache ceilings
 
 - Accept a cached-input ceiling up to 75,000 while retaining the fresh-input maximum of 50,000 and total-input maximum of 80,000. Existing lower policies remain valid.

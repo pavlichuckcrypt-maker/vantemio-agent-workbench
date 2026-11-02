@@ -3,6 +3,15 @@ const object = value => value !== null && typeof value === 'object' && !Array.is
 const graphTools = new Set(['list_projects', 'search_graph', 'search_code', 'trace_path',
   'get_code_snippet', 'get_architecture', 'query_graph', 'get_graph_schema']);
 
+// Generated backend state is not a source-discovery default. Explicit paths
+// and filters retain their native meaning, including intentional archive reads.
+export function defaultNativeSourceSearch(tool, args) {
+  if (tool !== 'grep' || !object(args) || args.path !== undefined || args.include !== undefined) {
+    return {args, changed: false};
+  }
+  return {args: {...args, include: '!**/.opencode-state/**'}, changed: true};
+}
+
 // Representation repair only: never infer a tool, project, symbol, or permission.
 export function normalizeGraphToolInput(input) {
   if (!object(input)) throw Error('GRAPH_INPUT_OBJECT_REQUIRED');
