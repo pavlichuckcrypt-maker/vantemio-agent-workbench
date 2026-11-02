@@ -21,7 +21,11 @@ export function workspaceGrepScope(root) {
     }
     const target = path.resolve(root, args.path || '.');
     if (!within(target, root)) throw new Error('Search outside the task workspace denied');
-    const [actualRoot, actualTarget] = await Promise.all([realpath(root), realpath(target)]);
+    const actualRoot = await realpath(root);
+    if (path.dirname(actualRoot) === actualRoot || key(actualRoot) === key(await realpath(homedir()))) {
+      throw new Error('An exact task workspace is required after path resolution');
+    }
+    const actualTarget = await realpath(target);
     if (!within(actualTarget, actualRoot)) throw new Error('Search path resolves outside the task workspace');
   };
 }
