@@ -26,6 +26,19 @@ export function matchNativeReadProofs(response,{sessionID,wanted=[],locations={}
  for(const id of wanted)if(!seen.has(id))unproven.push({callID:id,reason:'original_not_qualified_not_an_absence_or_effect_verdict'});
  return {proofs,unproven,metadataOnlyTransport:true,toolOrSourceAuthorityUnchanged:true};
 }
+// A displayed projection need not equal the complete native output. The host
+// may restore an already archived original through its existing scoped reader;
+// that reader must authenticate path/ownership, and we recheck the native hash.
+export async function hydrateNativeReadProofTexts(response,{knownTexts={},loadOriginal}={}){
+ const result={...knownTexts};
+ if(response?.protocol!=='indexed-native-read-v2'||!Array.isArray(response.parts)||typeof loadOriginal!=='function')return result;
+ for(const row of response.parts){
+  if(typeof row?.callID!=='string'||!/^[a-f0-9]{64}$/u.test(row.outputSHA256??''))continue;
+  if(typeof result[row.callID]==='string'&&sha(result[row.callID])===row.outputSHA256)continue;
+  try{const text=await loadOriginal(row);if(typeof text==='string'&&sha(text)===row.outputSHA256)Object.defineProperty(result,row.callID,{value:text,writable:true,configurable:true,enumerable:true});}catch{}
+ }
+ return result;
+}
 // Classify only an exact local pre-dispatch failure after its fixed native
 // release was authenticated by the host. The existing dispatcher still owns
 // current-input admission, durable intent and the no-replay fence.
