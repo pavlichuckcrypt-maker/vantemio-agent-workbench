@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.24
+
+- Reconcile an owned maintenance release that occurs after plugin startup. Reuse the host's inline wait and existing continuation controller; preserve later Stop, Goal/operation changes and disposed contexts.
+- Cover the startup/release race, unchanged dispatch ledgers, inactive historical Stop and bounded local waiting. No second instance reset or recurring watchdog is required.
+
 ## 0.6.23 — native permission compatibility
 
 - Honor native `external_directory` permission for host-qualified roots outside the current workspace/worktree. A host scope grant does not bypass a native denial.
