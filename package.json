@@ -63,7 +63,8 @@
     "./native-grep": "./src/native-grep.mjs",
     "./native-grep-tool": "./src/native-grep-tool.mjs",
     "./native-grep-scope": "./src/native-grep-scope.mjs",
-    "./peer-observation": "./src/peer-observation.mjs"
+    "./peer-observation": "./src/peer-observation.mjs",
+    "./station-read-envelope": "./src/station-read-envelope.mjs"
   },
   "files": [
     "src",
