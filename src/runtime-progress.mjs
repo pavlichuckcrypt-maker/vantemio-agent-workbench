@@ -40,7 +40,7 @@ export function unexecutedNativeToolIntent(last){
   return /^\{\s*(?:"text"\s*:\s*""\s*,\s*)?"tool_calls"\s*:\s*\[\s*\{\s*"(?:name|function)"\s*:/.test(text)&&/"arguments"\s*:/.test(text);
  }
 }
-function onlyWorkspaceNoteTools(tools,workspaceRoot,requiredPaths){
+function onlyWorkspaceNoteTools(tools,workspaceRoot,requiredPaths,shellPrefixes){
  if(!tools.length||typeof workspaceRoot!=='string'||!workspaceRoot||/[\0\r\n]/.test(workspaceRoot))return false;
  const api=/^(?:[A-Za-z]:[\\/]|\\\\)/.test(workspaceRoot)?path.win32:path.posix;
  if(!api.isAbsolute(workspaceRoot))return false;
@@ -48,22 +48,34 @@ function onlyWorkspaceNoteTools(tools,workspaceRoot,requiredPaths){
  if(!Array.isArray(requiredPaths)||requiredPaths.some(f=>typeof f!=='string'||!api.isAbsolute(f)||/[\0\r\n]/.test(f)))return false;
  const required=new Set(requiredPaths.map(key));
  const files=new Set(['PLAN.md','WORK.md','CURRENT_WORK.md','TODO.md','PROJECT_LOCATION.md'].map(n=>key(api.join(workspaceRoot,n))));
+ const notePath=f=>typeof f==='string'&&!/[\0\r\n]/.test(f)&&api.isAbsolute(f)&&files.has(key(f))&&!required.has(key(f));
+ const shellNote=(command,exit)=>{
+  if(exit!==0||typeof command!=='string'||command.length>32768||!Array.isArray(shellPrefixes)||shellPrefixes.length>8||shellPrefixes.some(p=>typeof p!=='string'||!p.length||p.length>16384))return false;
+  const prefixes=shellPrefixes.filter(p=>command.startsWith(p)).sort((a,b)=>b.length-a.length);
+  const text=prefixes.length?command.slice(prefixes[0].length):command;
+  const hash=text.match(/^Get-FileHash -Algorithm SHA256 -(?:LiteralPath|Path) '([^'\r\n\0]+)' \| Select-Object -ExpandProperty Hash; \(Get-Item '([^'\r\n\0]+)'\)\.Length$/i);
+  if(hash)return notePath(hash[1])&&notePath(hash[2])&&key(hash[1])===key(hash[2]);
+  const count=text.match(/^\$p='([^'\r\n\0]+)'; \$h=\(Get-FileHash -Algorithm SHA256 -LiteralPath \$p\)\.Hash; \$b=\(Get-Item -LiteralPath \$p\)\.Length; \$l=\(Get-Content -LiteralPath \$p\)\.Count; Write-Output "lines=\$l bytes=\$b sha256=\$h"$/i);
+  return !!count&&notePath(count[1]);
+ };
+
  return tools.every(p=>{
   const s=p.state,a=s?.input;if(s?.status!=='completed'||s.error||s.metadata?.knownTerminalFailure||!a||typeof a!=='object')return false;
+  if(p.tool==='bash')return shellNote(a.command,s.metadata?.exit);
   if(p.tool==='todowrite')return Array.isArray(a.todos)&&a.todos.every(t=>t&&typeof t.content==='string'&&['pending','in_progress','completed','cancelled'].includes(t.status));
   if(!['read','write','edit'].includes(p.tool))return false;
-  const f=a.filePath??a.file_path;return typeof f==='string'&&!/[\0\r\n]/.test(f)&&api.isAbsolute(f)&&files.has(key(f))&&!required.has(key(f));
+  const f=a.filePath??a.file_path;return notePath(f);
  });
 }
-export function terminalProgress(state,{messages,last,scope,automaticContinuation=false,continuationFrame={},workspaceRoot,workspaceNoteRequiredPaths=[]}){
+export function terminalProgress(state,{messages,last,scope,automaticContinuation=false,continuationFrame={},workspaceRoot,workspaceNoteRequiredPaths=[],workspaceNoteShellPrefixes=[]}){
  const facts=qualifiedProgressFacts(messages,scope),seen=new Set(state.observedProductiveFingerprints||[]),newFacts=facts.filter(f=>!seen.has(f.fingerprint));
  const scopeSHA256=digest(scope),text=(last.parts||[]).filter(p=>p.type==='text').map(p=>p.text||'').join('\n').trim();
- const finalSHA256=!last.info.error&&last.info.time?.completed&&text&&!(last.parts||[]).some(p=>p.type==='tool')?sha(text):null;
+ const finalSHA256=!last.info.error&&last.info.time?.completed&&!(last.parts||[]).some(p=>p.type==='tool')?sha(text):null;
  const frameSHA256=digest({scope,frame:continuationFrame});
  const frameSame=!state.lastProgressFrameSHA256||state.lastProgressFrameSHA256===frameSHA256;
  const repeated=!!finalSHA256&&finalSHA256===state.lastTerminalTextSHA256&&scopeSHA256===state.terminalProgressScopeSHA256&&frameSame&&!newFacts.length;
  const turnTools=messages.filter(m=>m.info?.parentID===last.info.parentID).flatMap(m=>(m.parts||[]).filter(p=>p.type==='tool'));
- const workspaceNotesOnly=onlyWorkspaceNoteTools(turnTools,workspaceRoot,workspaceNoteRequiredPaths);
+ const workspaceNotesOnly=onlyWorkspaceNoteTools(turnTools,workspaceRoot,workspaceNoteRequiredPaths,workspaceNoteShellPrefixes);
  const toolFormatRepair=unexecutedNativeToolIntent(last);
  const noActionTerminal=automaticContinuation===true&&!!finalSHA256&&last.info.finish==='stop'&&(toolFormatRepair||(!turnTools.length||workspaceNotesOnly)&&!newFacts.length);
  const noActionEvidenceSHA256=digest({scope,frame:continuationFrame,known:[...new Set([...seen,...facts.map(f=>f.fingerprint)])].sort(),...(toolFormatRepair?{unexecutedNativeToolIntent:true}:{})});

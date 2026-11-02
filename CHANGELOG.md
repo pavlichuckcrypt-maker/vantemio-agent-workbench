@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.27
+
+- Recognize two exact PowerShell scratch-note hash/count forms after a host-supplied native bootstrap prefix. Reject additional commands, foreign paths, required Source and unsuccessful outcomes.
+- Treat a completed empty automatic stop as a result needing the existing grounded repair, preventing an endless empty-response continuation.
+
 ## 0.6.26
 
 - Detect automatic turns that only read or update exact workspace scratch notes. Use the existing single task-grounded repair, then wait for new evidence instead of repeatedly calling the model.
