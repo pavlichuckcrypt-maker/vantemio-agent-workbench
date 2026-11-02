@@ -17,9 +17,12 @@ export function stationReadEnvelope({text,callID,filePath}={}){
  if(tail){
   const m=/^\[STATION_READ_COVERAGE_V1 (\{[^\r\n]*\})\]$/u.exec(tail);if(!m)return null;
   try{coverage=JSON.parse(m[1]);}catch{return null;}
-  if(typeof callID!=='string'||coverage.originalCallID!==callID||coverage.originalRequestID!==receipt[1]||coverage.version!==1||coverage.sourceSHA256!==receipt[3]||!Number.isSafeInteger(coverage.originalTotalLines)||coverage.originalTotalLines<0||coverage.returnedLineCount!==numbers.length||JSON.stringify(coverage.originalReturnedRange)!==JSON.stringify(range)||range&&range[1]>coverage.originalTotalLines||coverage.observationOnly!==true||coverage.noReleaseOrCompleteAuditAuthority!==true)return null;
+  if(typeof callID!=='string'||coverage.originalCallID!==callID||coverage.originalRequestID!==receipt[1]||coverage.version!==1||coverage.sourceSHA256!==receipt[3]||!Number.isSafeInteger(coverage.originalTotalLines)||coverage.originalTotalLines<0||coverage.observationOnly!==true||coverage.noReleaseOrCompleteAuditAuthority!==true)return null;
+  const fetched=coverage.originalReturnedRange;
+  if(fetched===null){if(range!==null||coverage.returnedLineCount!==0)return null;}
+  else if(!Array.isArray(fetched)||fetched.length!==2||!fetched.every(Number.isSafeInteger)||fetched[0]<1||fetched[1]<fetched[0]||fetched[1]>coverage.originalTotalLines||coverage.returnedLineCount!==fetched[1]-fetched[0]+1||!range||range[0]<fetched[0]||range[1]>fetched[1])return null;
  }
- return {sourceSHA256:receipt[3],requestID:receipt[1],receiptPath:receipt[2],receiptIndex:receipt.index,sourceRange:range,originalTotalLines:coverage?.originalTotalLines??null,coverageFooterAccepted:!!coverage,sourceSnapshotNotFreshCAS:true,readIsNotAuditAcceptance:true};
+ return {sourceSHA256:receipt[3],requestID:receipt[1],receiptPath:receipt[2],receiptIndex:receipt.index,sourceRange:range,originalTotalLines:coverage?.originalTotalLines??null,originalFetchedRange:coverage?.originalReturnedRange??null,fullFetchedPageDisplayed:coverage?JSON.stringify(range)===JSON.stringify(coverage.originalReturnedRange):null,coverageFooterAccepted:!!coverage,sourceSnapshotNotFreshCAS:true,readIsNotAuditAcceptance:true};
 }
 export function summarizeSourceRanges(entries=[]){
  const groups=new Map();
