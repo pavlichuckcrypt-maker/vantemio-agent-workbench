@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Match native read proofs by exact session/message/part/call identity and output hash, allowing the host to transfer metadata without transferring full tool output again. Ambiguous, foreign, incomplete or modified results remain unproven.
+- Qualify a repaired local read-proof failure for the existing model-only continuation controller while preserving Stop, uncertain operations and prior dispatches.
+- Keep verified archive metadata in the unchanged helper module across host window rebindings. No provider cache hit is inferred.
+
 ## 0.6.29
 
 - Separate OpenCode Watch and DeepSeek Harness Chief into named platform packages with independent versions and archives.

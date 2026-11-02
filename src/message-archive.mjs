@@ -3,6 +3,9 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {createBoundedProofCache} from './proof-cache.mjs';
 const sha=value=>createHash('sha256').update(value).digest('hex');
+let processArchive;
+// Kept in the unchanged helper module, not in a host window that gets rebound.
+export function sharedVerifiedMessageArchive(){return processArchive??=createVerifiedMessageArchive();}
 function stamp(stat){
  if(!stat.isFile()||stat.isSymbolicLink())throw Error('LOCAL_MESSAGE_ARCHIVE_INTEGRITY');
  const precise=typeof stat.mtimeNs==='bigint'&&typeof stat.ctimeNs==='bigint';

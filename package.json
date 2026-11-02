@@ -65,7 +65,8 @@
     "./native-grep-scope": "./src/native-grep-scope.mjs",
     "./peer-observation": "./src/peer-observation.mjs",
     "./station-read-envelope": "./src/station-read-envelope.mjs",
-    "./message-archive": "./src/message-archive.mjs"
+    "./message-archive": "./src/message-archive.mjs",
+    "./native-read-proof": "./src/native-read-proof.mjs"
   },
   "files": [
     "src",
