@@ -62,6 +62,8 @@ See [the host contract and recipe](docs/REQUEST_ADAPTER.md) or [русское �
 
 ## Shared runtime continuity
 
+For plugins that depend on a restored agent and its historical usage, `bindRestoredNativeAgent` from `./enrollment` delays initialization until the exact native session is published. It creates no agent or request. Declare native service dependencies and await the helper without returning its status object as a plugin effect. See [native startup](docs/NATIVE_STARTUP.md).
+
 Version0.6.0 adds authenticated original-result reconciliation, a byte-bounded proof cache, Stop-safe continuation transactions, completed maintenance qualification, explicit Source previews and progress signals. These host integration components preserve native model/provider choice and never replay UNKNOWN operations. See [the integration contract](docs/RUNTIME_CONTINUITY.md) and [русское руководство](docs/RUNTIME_CONTINUITY.ru.md).
 
 ## Native root context

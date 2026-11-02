@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.28
+
+- Bind existing native plugin initialization to publication of the same restored agent, including warm loading and concurrent callbacks.
+- Preserve original initialization errors, foreign sessions, cancellation and disposal without creating an agent, timer or model request.
+- Document the native plugin entry's void/disposer contract and declared service dependencies; verify the exported enrollment helper in a clean package consumer.
+
 ## 0.6.27
 
 - Recognize two exact PowerShell scratch-note hash/count forms after a host-supplied native bootstrap prefix. Reject additional commands, foreign paths, required Source and unsuccessful outcomes.

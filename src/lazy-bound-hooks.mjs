@@ -13,3 +13,22 @@ export function lazyBoundHooks(schema,build,hasBinding,providerID){
  hooks.event=async event=>{if(!active&&!await hasBinding())return;return (await bound()).event?.(event);};
  return hooks;
 }
+
+/** Bind existing plugin initialization to native restoration, without creating an agent or input. */
+export async function bindRestoredNativeAgent(ctx,{sessionID,install}){
+ if(typeof sessionID!=='string'||!sessionID||typeof install!=='function')throw Error('EXACT_NATIVE_RESTORE_BINDING_REQUIRED');
+ let live=true,initialization;
+ const initialize=async payload=>{
+  const agent=payload?.agent;
+  if(!live||payload?.signal?.aborted||agent?.session?.id!==sessionID)return;
+  if((ctx.agents??ctx.get?.('agents'))?.get(sessionID)!==agent)throw Error('EXACT_PUBLISHED_NATIVE_AGENT_REQUIRED');
+  if(!initialization)initialization=Promise.resolve().then(()=>install(agent));
+  return initialization;
+ };
+ const created=ctx.on('agent/created',initialize);
+ const preStep=ctx.on('agent/pre-step',async(payload,next)=>{await initialize(payload);return next();});
+ ctx.effect(()=>()=>{live=false;created?.();preStep?.();});
+ const agent=(ctx.agents??ctx.get?.('agents'))?.get(sessionID);
+ if(agent){await initialize({agent});return{phase:'native_agent_bound',sessionID};}
+ return{phase:'awaiting_native_agent_restore',sessionID};
+}

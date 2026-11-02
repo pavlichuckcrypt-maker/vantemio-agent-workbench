@@ -21,6 +21,14 @@ try {
   run([npm,'install','--offline','--ignore-scripts','--no-audit','--no-fund','--package-lock=false',archive],consumer);
   await writeFile(path.join(consumer,'verify.mjs'),`
 import assert from 'node:assert/strict';
+import {bindRestoredNativeAgent} from 'vantemio-agentic-backend/enrollment';
+assert.equal(typeof bindRestoredNativeAgent,'function');
+const restoredAgents=new Map(),restoreHooks=new Map();let restoreInstallCount=0;
+const restoreContext={agents:{get:id=>restoredAgents.get(id)},on:(name,fn)=>{restoreHooks.set(name,fn);return()=>restoreHooks.delete(name);},effect:fn=>fn()};
+const restoreState=await bindRestoredNativeAgent(restoreContext,{sessionID:'smoke-restored-agent',install:async()=>{restoreInstallCount++;}});
+assert.equal(restoreState.phase,'awaiting_native_agent_restore');assert.equal(restoreInstallCount,0);
+const restoredAgent={session:{id:'smoke-restored-agent'}};restoredAgents.set(restoredAgent.session.id,restoredAgent);
+await restoreHooks.get('agent/created')({agent:restoredAgent});assert.equal(restoreInstallCount,1);
 import {createNativeGrepTool,resolveNativeGrepExecutable} from 'vantemio-agentic-backend/native-grep-tool';
 import {workspaceGrepScope} from 'vantemio-agentic-backend/native-grep-scope';
 import {boundedNativeGrep} from 'vantemio-agentic-backend/native-grep';
