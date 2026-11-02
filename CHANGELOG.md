@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.22 — bounded native grep
+
+- Replace the native `grep` slot through the documented plugin interface while preserving its three arguments, permissions and original call identities.
+- Bound previews in ripgrep before transport, so a matching long JSON line does not become an oversized JSON record.
+- Preserve exact-file scope, includes, Unicode, binary framing, cancellation and explicit partial/truncated outcomes; never widen a missing path into its parent.
+- Export a portable SDK factory and workspace/realpath guard, with native PATH/cache binary discovery and no provider dependency or server.
+
 ## 0.6.21
 
 - Add a native grep default that excludes generated `.opencode-state` archives only when both path and include are omitted. Explicit archive searches and native path guards remain unchanged.

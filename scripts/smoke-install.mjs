@@ -21,6 +21,11 @@ try {
   run([npm,'install','--offline','--ignore-scripts','--no-audit','--no-fund','--package-lock=false',archive],consumer);
   await writeFile(path.join(consumer,'verify.mjs'),`
 import assert from 'node:assert/strict';
+import {createNativeGrepTool,resolveNativeGrepExecutable} from 'vantemio-agentic-backend/native-grep-tool';
+import {workspaceGrepScope} from 'vantemio-agentic-backend/native-grep-scope';
+import {boundedNativeGrep} from 'vantemio-agentic-backend/native-grep';
+assert.equal(typeof createNativeGrepTool,'function');assert.equal(typeof workspaceGrepScope,'function');assert.equal(typeof boundedNativeGrep,'function');
+await writeFile('grep-long.txt','needle'+'x'.repeat(70000));const installedGrep=await boundedNativeGrep({root:process.cwd(),executable:await resolveNativeGrepExecutable(),args:{pattern:'needle',path:'grep-long.txt'}});assert.equal(installedGrep.metadata.nativeGrep.matches,1);assert.ok(installedGrep.output.length<5000);
 import {writeFile,readFile,mkdir,symlink,realpath} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
