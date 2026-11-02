@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.26
+
+- Detect automatic turns that only read or update exact workspace scratch notes. Use the existing single task-grounded repair, then wait for new evidence instead of repeatedly calling the model.
+- Preserve explicitly required Source documents, meaningful code/docs/test work, manual input and provider/model changes, live tools, failures and uncertain outcomes. No tool or accepted control replay.
+
 ## 0.6.25
 
 - Keep unavailable peer-host observations unchanged while paging qualified peer detail into an exact original archive.
