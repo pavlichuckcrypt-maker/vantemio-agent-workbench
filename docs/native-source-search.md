@@ -38,7 +38,7 @@ export default async ctx => ({
 });
 ```
 
-Use an existing stronger host/task validator when available. The factory requires a validator and calls the native `grep` permission before execution. It preserves the native AbortSignal. Binary discovery checks configured PATH entries and OpenCode's existing cache; a host may supply `executable` explicitly. It does not install executables, create model requests or widen filesystem permissions. The low-level execution helper alone is not an authorization layer.
+Use an existing stronger host/task validator when available. The factory requires a validator and calls native `grep` and, where applicable, `external_directory` permission before execution. It preserves the native AbortSignal. Binary discovery checks configured PATH entries and OpenCode's existing cache; a host may supply `executable` explicitly. It does not install executables, create model requests or widen filesystem permissions. The low-level execution helper alone is not an authorization layer.
 
 Core previews use 2,000 columns, at most 100 displayed matches and a bounded result size; these are tool output limits, not agent action quotas. An explicit archive query is supported and is never silently changed into an exclusion query. Only a search without path and include uses the generated-state exclusion.
 

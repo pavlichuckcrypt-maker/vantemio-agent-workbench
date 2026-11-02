@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.23 — native permission compatibility
+
+- Honor native `external_directory` permission for host-qualified roots outside the current workspace/worktree. A host scope grant does not bypass a native denial.
+- Reject an empty pattern before execution, matching the native grep contract.
+- Reject workspace aliases that resolve to disk roots or the home directory.
+
 ## 0.6.22 — bounded native grep
 
 - Replace the native `grep` slot through the documented plugin interface while preserving its three arguments, permissions and original call identities.

@@ -29,6 +29,7 @@ export function createNativeGrepTool({tool, root, executable, validateScope,
       include: tool.schema.string().optional().describe('File glob, for example *.js or *.{ts,tsx}'),
     },
     async execute(args, context) {
+      if (!args?.pattern) throw new Error('pattern is required');
       if (!context?.sessionID || typeof context.directory !== 'string'
           || key(context.directory) !== key(root) || typeof context.ask !== 'function') {
         throw new Error('Current native search context required');
@@ -38,6 +39,21 @@ export function createNativeGrepTool({tool, root, executable, validateScope,
       Object.assign(args, normalizeArgs(args));
       await context.ask({permission: 'grep', patterns: [args.pattern], always: ['*'],
         metadata: {path: args.path, include: args.include}});
+      const target = path.resolve(root, args.path || '.');
+      const inside = base => {
+        const relative = path.relative(key(base), key(target));
+        return relative === '' || relative !== '..' && !relative.startsWith('..' + path.sep) && !path.isAbsolute(relative);
+      };
+      const worktree = context.worktree;
+      const managedWorktree = typeof worktree === 'string' && path.isAbsolute(worktree)
+        && path.dirname(path.resolve(worktree)) !== path.resolve(worktree);
+      if (!inside(root) && !(managedWorktree && inside(worktree))) {
+        const info = await stat(target);
+        const parentDir = info.isDirectory() ? target : path.dirname(target);
+        const glob = path.join(parentDir, '*').replaceAll('\\', '/');
+        await context.ask({permission: 'external_directory', patterns: [glob], always: [glob],
+          metadata: {filepath: target, parentDir}});
+      }
       return await run({root, executable: executable || await resolveNativeGrepExecutable(), args, signal: context.abort});
     },
   });
