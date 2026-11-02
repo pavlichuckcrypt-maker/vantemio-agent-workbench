@@ -41,7 +41,7 @@ import {normalizeGraphToolInput,planClientRead} from 'vantemio-agentic-backend/t
 import {compactServiceDescriptions,restoreServiceDescriptions} from 'vantemio-agentic-backend/service-description-budget';
 import {presentVerifiedTextRead} from 'vantemio-agentic-backend/verified-text-read-presentation';
 import {readonlyShellObservation} from 'vantemio-agentic-backend/readonly-shell-observation';
-import {currentPlanObservation} from 'vantemio-agentic-backend/plan-observation';
+import {currentPlanObservation,pagePlanObservation} from 'vantemio-agentic-backend/plan-observation';
 import {deriveReadCoverage} from 'vantemio-agentic-backend/read-coverage';
 import {isReconciliationObservationTool,projectReadonlyReconciliation} from 'vantemio-agentic-backend/readonly-reconciliation';
 assert.equal(isReconciliationObservationTool('studio_station_recover'),true);
@@ -50,6 +50,8 @@ const ordinaryTask={unknownTools:false};assert.equal(projectReadonlyReconciliati
 assert.equal(deriveReadCoverage({output:'<path>/project/a</path>\\n<type>file</type>\\n<content>\\n1: a\\n</content>\\n',totalLines:10,sourceSHA256:'a'.repeat(64)}).coversWholeFile,false);
 assert.equal(currentPlanObservation(Buffer.from('current: compare caller'),'PLAN.md').currentLocalText,'current: compare caller');
 assert.equal(currentPlanObservation('x'.repeat(7000),'PLAN.md').incomplete,true);
+const pagedPlan=await pagePlanObservation(currentPlanObservation('history '.repeat(1000),'PLAN.md'),{expectedFile:'PLAN.md',currentGoalAndTodoInline:true,archive:async text=>({file:'/history/display.json',sha256:createHash('sha256').update(text).digest('hex')})});
+assert.equal(pagedPlan.changed,true);assert.equal('currentLocalText' in pagedPlan.observation,false);assert.equal(pagedPlan.observation.incomplete,true);
 assert.equal(readonlyShellObservation("cd /project/src && sed -n '1,20p' module.py",{scopeRoots:['/project']}),true);
 assert.equal(readonlyShellObservation('sed -i 1,20p /project/module.py',{scopeRoots:['/project']}),false);
 const budgetedService=compactServiceDescriptions({messages:[{role:'user',content:'Owner task remains'}]});

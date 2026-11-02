@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.19 — archive historical PLAN displays
+
+- Page large derived PLAN displays after the host verifies that current Goal/task/TODO remain in the request. Preserve the exact original observation through an archive callback and verify its returned SHA.
+- Keep source-file identity, incomplete status and original character count distinct from the archived display. Native reads, owner instructions and execution history are outside this helper's scope.
+- Missing task qualification, changed file bindings, small displays and already paged observations remain unchanged. Archive failures cannot erase the input.
+
 ## 0.6.18 — remove duplicate current PLAN data
 
 - Add a pure projection that replaces a derivative PLAN/CURRENT_WORK excerpt with a reference only when the same excerpt is already present in a current native read result for that exact file.
