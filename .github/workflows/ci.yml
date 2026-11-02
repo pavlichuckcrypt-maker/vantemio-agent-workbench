@@ -18,3 +18,4 @@ jobs:
       - run: npm test
       - run: npm run check:release
       - run: npm run smoke:install
+      - run: npm run smoke:platforms

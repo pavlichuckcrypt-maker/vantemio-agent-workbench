@@ -2,6 +2,15 @@
 
 **Reliability toolkit for autonomous development in OpenCode and other coding-agent hosts.** Provider-neutral policies, tested integration contracts and configuration examples. [Русский](docs/README.ru.md).
 
+The two backends are separate release units:
+
+| Subdivision | Package / target | Native configuration |
+|---|---|---|
+| [OpenCode Watch](packages/opencode-watch) | `vantemio-opencode-watch` / `opencode-watch` | `opencode.json` or `opencode.jsonc` |
+| [DeepSeek Harness Chief](packages/deepseek-harness-chief) | `vantemio-deepseek-harness-chief` / `deepseek-harness-chief` | selected `cordis.patch.yml` |
+
+Each has its own package version, archive, installation root, release pointer and activation/rollback. The root `vantemio-agentic-backend` package is a **shared library**, not an interchangeable installer. Target packages vendor only their entry point's shared dependencies. See [platform boundaries](docs/PLATFORM_BACKENDS.md).
+
 Use this toolkit to connect task context, controlled recovery and original-result accounting to an existing agent runtime. This repository shares the reusable parts of our development infrastructure: bounded continuation, original-outcome accounting, provider failure guards, lazy plugin enrollment, request pacing, fresh/cache budget validation, and a pinned catalog of ten upstream engineering/audit skills.
 
 **Scope:** this is not a complete hosted agent, a drop-in OpenCode server, or the private Studio production system. The kit includes common task/context preparation, selected tool-result projection and usage accounting. Native authentication, enrollment, durable admission/storage, transport, peer identity and qualified provider-specific serializers still belong to the host. The policy library does not grant write authority or independently dispatch model requests. Do not deploy it as a replacement backend without testing those integrations.

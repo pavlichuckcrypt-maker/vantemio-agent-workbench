@@ -1,0 +1,12 @@
+{
+  "name": "vantemio-opencode-watch",
+  "version": "0.1.1",
+  "workbenchCoreVersion": "0.6.29",
+  "private": true,
+  "type": "module",
+  "description": "OpenCode watch backend integration package",
+  "license": "MIT",
+  "engines": {"node": ">=22"},
+  "exports": {".": "./index.mjs"},
+  "files": ["index.mjs", "runtime.manifest.json", "core", "README.md", "LICENSE", "THIRD_PARTY.md"]
+}

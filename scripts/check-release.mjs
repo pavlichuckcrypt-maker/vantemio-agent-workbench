@@ -1,6 +1,6 @@
 import{readdir,readFile,lstat}from'node:fs/promises';import path from'node:path';import{fileURLToPath}from'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const allowedDirs=new Set(['src','test','config','docs','scripts','.github']);
+const allowedDirs=new Set(['src','test','config','docs','scripts','packages','.github']);
 const allowedRoot=new Set(['README.md','package.json','LICENSE','THIRD_PARTY.md','CHANGELOG.md','.gitignore']);
 const patterns=[['credential',new RegExp('(?:sk'+'-[A-Za-z0-9]{20,}|gh'+'[pousr]_[A-Za-z0-9]{20,}|github'+'_pat_[A-Za-z0-9_]{20,})')],['private key',new RegExp('-----BEGIN '+'(?:RSA |EC |OPENSSH )?PRIVATE KEY-----')],['private deployment',new RegExp('(?:vi'+'xstels|Anuna'+'Baracu4567|AImontag'+'Studio|C:[\\/](?:Users|AI)[\\/]|192\\.168\\.|100\\.97\\.200\\.64)','i')],['runtime identity',new RegExp('(?:ses'+'_[a-zA-Z0-9]{20,}|msg'+'_[a-zA-Z0-9]{20,})')]];
 let count=0;const failures=[];

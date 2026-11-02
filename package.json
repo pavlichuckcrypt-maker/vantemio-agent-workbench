@@ -1,6 +1,6 @@
 {
   "name": "vantemio-agentic-backend",
-  "version": "0.6.28",
+  "version": "0.6.29",
   "private": true,
   "type": "module",
   "description": "Reliability toolkit for autonomous development in OpenCode and other coding-agent hosts",
@@ -12,9 +12,14 @@
     "test": "node --test test/*.test.mjs",
     "check:release": "node scripts/check-release.mjs",
     "smoke:install": "node scripts/smoke-install.mjs",
-    "test:native-root": "node --test test/native-sdk/*.test.mjs"
+    "test:native-root": "node --test test/native-sdk/*.test.mjs",
+    "pack:opencode": "node scripts/build-platform-packages.mjs --target opencode-watch",
+    "pack:harness-chief": "node scripts/build-platform-packages.mjs --target deepseek-harness-chief",
+    "smoke:platforms": "node scripts/smoke-platform-packages.mjs"
   },
   "exports": {
+    "./runtime-target": "./src/runtime-target.mjs",
+    "./runtime-installation": "./src/runtime-installation.mjs",
     "./continuation": "./src/continuation-policy.mjs",
     "./recovery": "./src/backend-repair-policy.mjs",
     "./budget": "./src/request-budget.mjs",

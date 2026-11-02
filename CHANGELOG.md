@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.29
+
+- Separate OpenCode Watch and DeepSeek Harness Chief into named platform packages with independent versions and archives.
+- Require explicit runtime target, host-owned installation descriptors, compatible native profile kinds and disjoint mutable installation roots.
+- Reject the other platform or a shared-library archive before a host writer or staging operation. Stage verified package bytes only into that target's immutable version directory; native configuration and activation remain with the existing qualified loader.
+
 ## 0.6.28
 
 - Bind existing native plugin initialization to publication of the same restored agent, including warm loading and concurrent callbacks.

@@ -1,0 +1,7 @@
+{
+  "schema": "vantemio.distribution-role/v1",
+  "kind": "shared-library",
+  "deployableAsRuntime": false,
+  "runtimeTarget": null,
+  "note": "Shared primitives only. Use the separately named OpenCode Watch or DeepSeek Harness Chief package for a platform installation."
+}
