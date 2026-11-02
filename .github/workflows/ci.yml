@@ -10,6 +10,11 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
+      - name: Install native grep dependency
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install --no-install-recommends -y ripgrep
+          rg --version
       - run: npm test
       - run: npm run check:release
       - run: npm run smoke:install
