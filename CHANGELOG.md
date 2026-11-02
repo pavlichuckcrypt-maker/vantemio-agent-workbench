@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.25
+
+- Keep unavailable peer-host observations unchanged while paging qualified peer detail into an exact original archive.
+- Add a verified display page for large declared developer PLAN reads when the current Goal/task/TODO remain inline; preserve the complete original read and line-continuation payload. Required Source and project specifications are excluded.
+- The host repair adapter keeps the original unsent admission limit when qualifying a reconstructed packet. No increased context ceiling or provider-cache assumption is needed.
+
 ## 0.6.24
 
 - Reconcile an owned maintenance release that occurs after plugin startup. Reuse the host's inline wait and existing continuation controller; preserve later Stop, Goal/operation changes and disposed contexts.
