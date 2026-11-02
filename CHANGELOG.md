@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.20 — separate fresh and qualified cache ceilings
+
+- Accept a cached-input ceiling up to 75,000 while retaining the fresh-input maximum of 50,000 and total-input maximum of 80,000. Existing lower policies remain valid.
+- Clarify host admission: credit requires bound original provider usage and an unchanged eligible prefix; missing or expired evidence grants no credit. A cached ceiling is neither a cache hit nor an additional token reservation.
+
 ## 0.6.19 — archive historical PLAN displays
 
 - Page large derived PLAN displays after the host verifies that current Goal/task/TODO remain in the request. Preserve the exact original observation through an archive callback and verify its returned SHA.

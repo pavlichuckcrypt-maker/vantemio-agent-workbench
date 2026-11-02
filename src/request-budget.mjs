@@ -5,7 +5,7 @@ export function validateRequestBudget(policy){
  targetFreshInputTokens=policy.targetFreshInputTokens??maxFreshInputTokens;
  if(!Number.isSafeInteger(maxInputTokens)||maxInputTokens<1||maxInputTokens>80000||maxSerializedTextBytes!==1048576||
  !Number.isSafeInteger(maxFreshInputTokens)||maxFreshInputTokens<1||maxFreshInputTokens>50000||maxFreshInputTokens>maxInputTokens||
- !Number.isSafeInteger(maxCachedInputTokens)||maxCachedInputTokens<0||maxCachedInputTokens>70000||
+ !Number.isSafeInteger(maxCachedInputTokens)||maxCachedInputTokens<0||maxCachedInputTokens>75000||
  !Number.isSafeInteger(targetFreshInputTokens)||targetFreshInputTokens<1||targetFreshInputTokens>maxFreshInputTokens||
  policy.cacheEvidenceMaxAgeMs!==3600000)throw Error('INVALID_OWNER_FRESH_CACHE_INPUT_BUDGET');
  return{maxInputTokens,maxSerializedTextBytes,maxFreshInputTokens,maxCachedInputTokens,targetFreshInputTokens,
