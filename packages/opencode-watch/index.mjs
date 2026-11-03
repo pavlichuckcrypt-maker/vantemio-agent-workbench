@@ -4,6 +4,7 @@ import {stageRuntimePackage} from './core/src/runtime-installation.mjs';
 import {fileURLToPath} from 'node:url';
 export {createNativeGrepTool,resolveNativeGrepExecutable} from './core/src/native-grep-tool.mjs';
 export {createAgentRequestAdapter} from './core/src/agent-request-adapter.mjs';
+export {retainActiveWorkingReadContext,projectVerifiedTaskSourceCacheReads,planSourceContextTransfer} from './core/src/active-read-context.mjs';
 export {stationReadEnvelope,summarizeSourceRanges} from './core/src/station-read-envelope.mjs';
 export {nativeToolLocations,matchNativeReadProofs,hydrateNativeReadProofTexts,qualifyReadonlyProofRecovery} from './core/src/native-read-proof.mjs';
 export {createVerifiedMessageArchive,sharedVerifiedMessageArchive} from './core/src/message-archive.mjs';

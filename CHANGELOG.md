@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.31 / OpenCode Watch 0.1.3
+
+- Preserve verified cached Source code once, with original coordinates and recoverable native evidence, instead of nested numbered read wrappers.
+- Protect explicitly required Goal originals; reject changed Source, incomplete coverage, changed owner frames and unqualified aliases.
+- Keep unchanged Source in the native stable prefix while observations change; provider cache usage remains separately measured.
+
 ## 0.6.30
 
 - Match native read proofs by exact session/message/part/call identity and output hash, allowing the host to transfer metadata without transferring full tool output again. Ambiguous, foreign, incomplete or modified results remain unproven.
