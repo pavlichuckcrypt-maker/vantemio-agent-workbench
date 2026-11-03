@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.6.30
 
 - Match native read proofs by exact session/message/part/call identity and output hash, allowing the host to transfer metadata without transferring full tool output again. Ambiguous, foreign, incomplete or modified results remain unproven.
 - Qualify a repaired local read-proof failure for the existing model-only continuation controller while preserving Stop, uncertain operations and prior dispatches.
 - Keep verified archive metadata in the unchanged helper module across host window rebindings. No provider cache hit is inferred.
+- Add OpenCode Watch0.1.2 exports for native read envelopes, metadata proofs and verified local archive reuse. Preserve the previously released Harness0.1.1 closure/core0.6.29 through an exact source and payload lock; changed dependencies fail the build until explicitly adopted.
 
 ## 0.6.29
 

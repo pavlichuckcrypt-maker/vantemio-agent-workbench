@@ -1,0 +1,38 @@
+{
+  "schema": "vantemio.platform-core-source-lock/v1",
+  "runtimeTarget": "deepseek-harness-chief",
+  "packageName": "vantemio-deepseek-harness-chief",
+  "packageVersion": "0.1.1",
+  "coreVersion": "0.6.29",
+  "sourceCommit": "4d2b5577f32a98102840fba2d3d2704eaec0142d",
+  "releaseTag": "deepseek-harness-chief-v0.1.1",
+  "archiveSHA256": "99028611a64b30432404c24411d0bdfa3c4e914afa1fed513349d01bb175af82",
+  "releaseManifestSHA256": "631d5317e459e056fb0d9143ce6c7f4c016babed5c77a37effaa77cfe1b4f087",
+  "payloadSHA256": "95492cdd51a55675ac1ab0aae92cb727555c5a35ee91ab1a04ccc0d2463d99f3",
+  "files": [
+    {
+      "path": "config/shared-library.manifest.json",
+      "sha256": "64c493e888fdcdd01fbaf705077977a09b9be3a9d2e8bbe1247cd2c37d40a1d2"
+    },
+    {
+      "path": "src/harness-root-context.mjs",
+      "sha256": "f55fd303e8ae216c2deb577e47ab3d45be1026b7a7311650f620d62b0b49863c"
+    },
+    {
+      "path": "src/lazy-bound-hooks.mjs",
+      "sha256": "368f4e8fcb0ecfd2602bc90dc549976e7c1c015d5d47b5b5b60c686920d1504e"
+    },
+    {
+      "path": "src/runtime-installation.mjs",
+      "sha256": "3c90d7a7d8529db262f7b2a9e11c463dd55287f28b712b37112b8c5f289939f9"
+    },
+    {
+      "path": "src/runtime-target.mjs",
+      "sha256": "716988700c23cb1303d989c85c371d7e804041ebde25b59711a6fa3e0f79f897"
+    },
+    {
+      "path": "src/task-artifact-view.mjs",
+      "sha256": "221e11b337e45881da8566e95c54f8e77c85473c8b7414e2bb737d0bc187543a"
+    }
+  ]
+}

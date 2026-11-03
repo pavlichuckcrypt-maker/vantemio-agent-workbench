@@ -1,5 +1,7 @@
 # Two platform backends
 
+OpenCode Watch0.1.2 explicitly adopts shared core0.6.30. Harness0.1.1 remains on core0.6.29. The build checks its previously published dependency closure and entire payload against `config/platform-core-locks/deepseek-harness-chief-0.1.1.json`; it cannot silently substitute changed core files or rebuild a changed payload under the old version. This is a public build provenance check, not an activation of the installed Harness runtime. Each platform still has its own native loader, install root and current-release pointer.
+
 OpenCode Watch and DeepSeek Harness Chief are separate subdivisions. They can reuse pure libraries without sharing mutable runtime configuration or release state.
 
 | Boundary | OpenCode Watch | DeepSeek Harness Chief |
