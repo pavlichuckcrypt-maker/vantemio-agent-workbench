@@ -8,6 +8,7 @@ export {retainActiveWorkingReadContext,projectVerifiedTaskSourceCacheReads,planS
 export {stationReadEnvelope,summarizeSourceRanges} from './core/src/station-read-envelope.mjs';
 export {nativeToolLocations,matchNativeReadProofs,hydrateNativeReadProofTexts,qualifyReadonlyProofRecovery} from './core/src/native-read-proof.mjs';
 export {createVerifiedMessageArchive,sharedVerifiedMessageArchive} from './core/src/message-archive.mjs';
+export {selectTaskDiagnosticOriginal} from './core/src/task-diagnostic-original.mjs';
 export const runtimeTarget='opencode-watch';
 const release=JSON.parse(readFileSync(new URL('./runtime.manifest.json',import.meta.url),'utf8'));
 export const verifyInstallation=(installation,actualHost)=>assertRuntimeTarget({expectedTarget:runtimeTarget,release,installation,actualHost});

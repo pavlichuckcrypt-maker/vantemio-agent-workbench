@@ -20,6 +20,7 @@ import fs from 'node:fs/promises';import path from 'node:path';import os from 'n
 import {fileURLToPath} from 'node:url';
 import * as open from 'vantemio-opencode-watch';import * as chief from 'vantemio-deepseek-harness-chief';
 assert.equal(open.runtimeTarget,'opencode-watch');assert.equal(chief.runtimeTarget,'deepseek-harness-chief');
+assert.equal(typeof open.selectTaskDiagnosticOriginal,'function');assert.equal(typeof chief.projectHarnessWorkingNotes,'function');
 assert.equal(typeof open.projectVerifiedTaskSourceCacheReads,'function');assert.equal(typeof open.stationReadEnvelope,'function');assert.equal(typeof open.hydrateNativeReadProofTexts,'function');assert.equal(typeof open.sharedVerifiedMessageArchive,'function');
 const openRoot=fileURLToPath(new URL('.',import.meta.resolve('vantemio-opencode-watch'))),chiefRoot=fileURLToPath(new URL('.',import.meta.resolve('vantemio-deepseek-harness-chief')));
 assert.equal(JSON.parse(await fs.readFile(path.join(openRoot,'core/package.json'),'utf8')).version,${JSON.stringify(expectedCores['opencode-watch'])});assert.equal(JSON.parse(await fs.readFile(path.join(chiefRoot,'core/package.json'),'utf8')).version,${JSON.stringify(expectedCores['deepseek-harness-chief'])});

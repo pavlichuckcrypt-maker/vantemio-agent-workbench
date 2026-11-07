@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.32 / OpenCode Watch 0.1.4 / DeepSeek Harness Chief 0.1.2
+
+- OpenCode Watch follows the current task or its most recent own recovery to the exact original test failure even after unrelated shell errors. Existing native readback still authenticates the result.
+- DeepSeek Harness Chief revalidates public working notes against the current native Goal, task, turn and original assistant events before forwarding them through the root adapter.
+- Both archives remain independent release targets with unchanged activation and rollback contracts.
+
 ## 0.6.31 / OpenCode Watch 0.1.3
 
 - Preserve verified cached Source code once, with original coordinates and recoverable native evidence, instead of nested numbered read wrappers.

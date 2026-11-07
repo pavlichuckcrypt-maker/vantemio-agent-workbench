@@ -51,3 +51,47 @@ test('legacy migration does not replace a foreign method or another adapter clas
 
 
 test('unsupported lifecycle refuses before changing a native adapter',async()=>{const tmp=await mkdtemp(path.join(os.tmpdir(),'unsupported-lifecycle-')),a=adapter(),llm=registry(a),prepare=a.prepareCall,stream=a.stream;try{const sdk=path.join(root,'@deepseek-ai/dsh-llm-pi-ai/lib/index.js');await assert.rejects(async()=>apply({llm,on:()=>{}},{moduleRoot:root,stateRoot:tmp,expectedAdapterModuleSHA256:sha(await readFile(sdk)),...expected}),/NATIVE_SCOPED_LIFECYCLE_REQUIRED/);assert.equal(a.prepareCall,prepare);assert.equal(a.stream,stream);}finally{await rm(tmp,{recursive:true,force:true});}});
+
+test('qualified notes reach the actual native provider payload through the root adapter', async () => {
+  const options = input();
+  const goal = {id:'fixture-goal',revision:1,phase:'active',activation:'armed'};
+  const taskSHA256 = sha('fixture-task');
+  const text = 'Current native notes survive the root adapter.';
+  const body = '[RECENT EXACT WORKING NOTES]\n'+JSON.stringify({
+    schema:1,sessionID:options.sessionId,goalID:goal.id,goalRevision:goal.revision,taskSHA256,
+    nativeTurn:4,notes:[{seq:1,text,textSHA256:sha(text)}],
+    quotedPublicHistory:true,sourceAuthority:false,productAcceptance:false
+  });
+  const events = [
+    {type:'turn/start',seq:0,data:{turn:4}},
+    {type:'assistant/message',seq:1,data:{turn:4,message:{content:[{type:'text',text}]}}},
+    {type:'developer/message',seq:2,data:{turn:4,message:{id:'native-note',role:'developer',
+      source:{kind:'studio-working-notes-v1',sessionID:options.sessionId,goalID:goal.id,
+        goalRevision:goal.revision,taskSHA256,notesSHA256:sha(body)},
+      content:[{type:'text',text:body}]}}}
+  ];
+  const session = {id:options.sessionId,seq:events.length,surface:{nodes:[2]},eventAt:seq=>events[seq]};
+  const a=adapter(), llm=registry(a);
+  const patch=installRootCompatibility(llm,{...expected,trustedArtifactsFor:()=>({workingNotes:{session,goal,taskSHA256}})});
+  patch.sync();
+  try {
+    const {openAICompletionsApi}=await import(pathToFileURL(path.join(pi,'openai-completions.lazy.js')).href);
+    const model={provider:'fixture-provider',api:'openai-completions',id:'fixture-notes-model',name:'Fixture',baseUrl:'https://offline.invalid/v1',reasoning:true,input:['text'],contextWindow:200000,maxTokens:32768,cost:usage.cost,compat:{}};
+    const opts={...options,provider:model.provider,model:model.id};
+    const prepared=await a.prepareCall(opts.provider,opts.model);
+    const wire=(await prepared.stream(opts).next()).value.options;
+    const context=await nativeContext(wire,model);
+    let payload, fetchCalls=0;
+    for await (const _ of openAICompletionsApi().streamSimple(model,context,{
+      apiKey:'offline-fixture-never-sent',maxRetries:0,
+      onPayload:value=>{payload=value;throw Error('OFFLINE_CAPTURE_BEFORE_HTTP');},
+      fetch:async()=>{fetchCalls++;throw Error('OFFLINE_NETWORK_FORBIDDEN');}
+    })) {}
+    assert(payload);
+    assert.equal(JSON.stringify(payload).split(text).length,2);
+    assert.equal(payload.model,model.id);
+    assert.equal(fetchCalls,0);
+  } finally {
+    patch.dispose();
+  }
+});

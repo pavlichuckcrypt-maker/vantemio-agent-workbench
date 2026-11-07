@@ -2,6 +2,8 @@
 import {readFile,writeFile,mkdir,rename} from 'node:fs/promises';
 import {createHash,randomUUID} from 'node:crypto';import path from 'node:path';import {pathToFileURL} from 'node:url';
 import{stableTaskArtifactPrefix,qualifyTaskArtifact}from'./task-artifact-view.mjs';
+import {projectHarnessWorkingNotes} from './harness-working-notes.mjs';
+export {projectHarnessWorkingNotes};
 export const name='studio-pi-root-context-compat';export const inject=['llm','sessions'];
 const sha=v=>createHash('sha256').update(typeof v==='string'||v instanceof Uint8Array?v:JSON.stringify(v)).digest('hex');
 export function preserveNativeRoot(options){
@@ -23,7 +25,7 @@ async function save(file,data){await mkdir(path.dirname(file),{recursive:true});
 export function installRootCompatibility(llm,{expectedPrepareSHA256,expectedStreamSHA256,onForward=async()=>{},trustedArtifactsFor=()=>[]}){
  if(!(llm?.adapters instanceof Map)||typeof llm.emitAdaptersUpdated!=='function')throw Error('QUALIFIED_NATIVE_LLM_REGISTRY_REQUIRED');
  const owned=new Map();let busy=false,disposed=false;
- function wrap(options,delegate){return (async function*(){let authority=null;try{authority=await trustedArtifactsFor(options.sessionId);}catch{}const trusted=Array.isArray(authority)?authority:authority?.messages??[],qualified=authority?.kind==='current-native-task-artifacts-v1';const root=preserveNativeRoot(options),prefix=stableTaskArtifactPrefix(root.options,{trustedArtifacts:trusted,includeMissingNative:qualified,currentTaskBinding:qualified?authority:null}),view={...root,options:prefix.options,taskPrefixChanged:prefix.changed,taskPrefixSHA256:prefix.taskPrefixSHA256,taskArtifactCount:prefix.artifactCount,insertedNativeArtifactCount:prefix.insertedNativeArtifactCount,taskPrefixReason:prefix.reason,nativeSessionProvenanceUsed:prefix.nativeSessionProvenanceUsed,trustedArtifactCount:trusted.length,wireArtifactShapes:(root.options.messages??[]).filter(m=>m.content?.some(b=>b.type==='text'&&b.text.includes('[CURRENT DECLARED TASK ARTIFACT]'))).map(m=>({role:m.role,sourceKind:m.source?.kind??null,relativePath:m.source?.relativePath??null,contentSHA256:sha(m.content),blockTypes:m.content.map(b=>b.type)}))};try{await onForward(options,view);}catch{}yield*delegate(view.options);})();}
+ function wrap(options,delegate){return (async function*(){let authority=null;try{authority=await trustedArtifactsFor(options.sessionId);}catch{}const trusted=Array.isArray(authority)?authority:authority?.messages??[],qualified=authority?.kind==='current-native-task-artifacts-v1';const history=authority?.workingNotes?projectHarnessWorkingNotes(options,authority.workingNotes):options;const root=preserveNativeRoot(history),prefix=stableTaskArtifactPrefix(root.options,{trustedArtifacts:trusted,includeMissingNative:qualified,currentTaskBinding:qualified?authority:null}),view={...root,options:prefix.options,taskPrefixChanged:prefix.changed,taskPrefixSHA256:prefix.taskPrefixSHA256,taskArtifactCount:prefix.artifactCount,insertedNativeArtifactCount:prefix.insertedNativeArtifactCount,taskPrefixReason:prefix.reason,nativeSessionProvenanceUsed:prefix.nativeSessionProvenanceUsed,trustedArtifactCount:trusted.length,wireArtifactShapes:(root.options.messages??[]).filter(m=>m.content?.some(b=>b.type==='text'&&b.text.includes('[CURRENT DECLARED TASK ARTIFACT]'))).map(m=>({role:m.role,sourceKind:m.source?.kind??null,relativePath:m.source?.relativePath??null,contentSHA256:sha(m.content),blockTypes:m.content.map(b=>b.type)}))};try{await onForward(options,view);}catch{}yield*delegate(view.options);})();}
  function sync(notify=false){
   if(disposed||busy)return 0;busy=true;let added=0;
   try{
@@ -103,7 +105,8 @@ export async function apply(ctx,config){
   const root=session.cwd??session.meta?.cwd??session.header?.cwd;if(typeof root!=='string')return[];
   const data=await collectArtifacts(root,goal),latest=goals.get(agent);if(data.status!=='qualified'||latest.id!==goal.id||latest.revision!==goal.revision||latest.phase!=='active'||latest.activation==='disarmed')return[];
   const messages=session.deriveMessages().filter(m=>{const proof=qualifyTaskArtifact(m,id);return proof&&proof.taskSHA256===data.taskSHA256&&proof.goalID===goal.id&&data.artifacts.some(a=>a.status==='current'&&a.path===proof.path&&a.relativePath===proof.relativePath&&a.sourceSHA256===proof.sourceSHA256&&a.text===proof.body);});
-  return {kind:'current-native-task-artifacts-v1',messages,taskSHA256:data.taskSHA256,goalID:goal.id};
+  return {kind:'current-native-task-artifacts-v1',messages,taskSHA256:data.taskSHA256,goalID:goal.id,
+    ...(config.workingNotesSessionID===id?{workingNotes:{session,goal:latest,taskSHA256:data.taskSHA256}}:{})};
  },onForward:async(options,view)=>{
   observed++;await save(path.join(config.stateRoot,'root-contract-forwarding',sha(String(options.sessionId??'unbound'))+'.json'),{
    schema:1,pid:process.pid,at:new Date().toISOString(),normalizerVersion:2,moduleSHA256,sessionID:options.sessionId??null,provider:options.provider,model:options.model,reasoningEffort:options.reasoningEffort??null,

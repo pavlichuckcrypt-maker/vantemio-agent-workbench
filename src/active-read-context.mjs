@@ -117,3 +117,5 @@ export function projectVerifiedTaskSourceCacheReads(body,view,{sourceOriginals={
  }
  return{version:1,changes,originalsAndNativeProtocolUnchanged:true,providerCacheHitNotClaimed:true};
 }
+
+export {selectTaskDiagnosticOriginal} from './task-diagnostic-original.mjs';

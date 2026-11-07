@@ -4,6 +4,7 @@ import {stageRuntimePackage} from './core/src/runtime-installation.mjs';
 import {fileURLToPath} from 'node:url';
 export {bindRestoredNativeAgent} from './core/src/lazy-bound-hooks.mjs';
 export {installRootCompatibility} from './core/src/harness-root-context.mjs';
+export {projectHarnessWorkingNotes} from './core/src/harness-working-notes.mjs';
 export const runtimeTarget='deepseek-harness-chief';
 const release=JSON.parse(readFileSync(new URL('./runtime.manifest.json',import.meta.url),'utf8'));
 export const verifyInstallation=(installation,actualHost)=>assertRuntimeTarget({expectedTarget:runtimeTarget,release,installation,actualHost});
